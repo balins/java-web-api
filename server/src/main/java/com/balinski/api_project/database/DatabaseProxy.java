@@ -10,11 +10,9 @@ public class DatabaseProxy {
     static String driver;
     static String username;
     static String password;
-    static boolean isInitialized = false;
 
-    public DatabaseProxy() {
-        if(!isInitialized)
-            loadDatabaseProperties();
+    static {
+        loadDatabaseProperties();
     }
 
     static Connection getDatabaseConnection() {
@@ -23,7 +21,7 @@ public class DatabaseProxy {
         try {
             conn = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            handleSqlException(e, "Could not connect to database");
+            handleSqlException(e, "Could not connect to database.");
         }
 
         return conn;
@@ -33,18 +31,7 @@ public class DatabaseProxy {
         try {
             conn.close();
         } catch (SQLException e) {
-            handleSqlException(e, "Could not close the database connection");
-        }
-    }
-
-    static void handleSqlException(SQLException sqle, String message) {
-        System.err.println(message);
-        System.err.println("SQL state: " + sqle.getSQLState());
-
-        Exception e = sqle.getNextException();
-        while(e != null) {
-            System.err.println(e.getMessage());
-            e = sqle.getNextException();
+            handleSqlException(e, "Could not close the database connection.");
         }
     }
 
@@ -55,11 +42,8 @@ public class DatabaseProxy {
         try (InputStream input = new FileInputStream(pathToProperties)) {
             props = new Properties();
             props.load(input);
-
         } catch (IOException e) {
-            System.err.println("Could not find or load database config file: " + e.getMessage());
-            System.err.println("Shutting down the server...");
-            System.exit(-1);
+            handleConfigException(e, "Could not find or load database config file.");
         }
 
         url = props.getProperty("url");
@@ -68,21 +52,28 @@ public class DatabaseProxy {
         password = props.getProperty("password");
 
         if(Stream.of(url, driver, username, password).anyMatch(Objects::isNull)) {
-            System.out.println("Cannot initialize database proxy: ");
-            System.err.println("one or more of properties (url, driver, username, password) is missing");
-            System.err.println("Shutting down the server...");
-            System.exit(-1);
+            handleConfigException(null, "Cannot initialize database proxy: " +
+                    "one or more of properties (url, driver, username, password) is missing");
         }
 
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
-            System.err.println("Cannot initialize database proxy:");
-            System.err.println("Driver class " + driver + " not found: " + e.getCause());
-            System.err.println("Shutting down the server...");
-            System.exit(-1);
+            handleConfigException(e, "Cannot initialize database proxy: driver class " + driver + " not found.");
         }
+    }
 
-        isInitialized = true;
+    static void handleSqlException(SQLException e, String message) {
+        System.err.println(message);
+        System.err.println(e.getMessage());
+        System.err.println("SQL state: " + e.getSQLState());
+    }
+
+    private static void handleConfigException(Exception e, String message) {
+        System.err.println(message);
+        if(e != null)
+            System.err.println(e.getMessage());
+        System.err.println("Shutting the application...");
+        System.exit(-1);
     }
 }

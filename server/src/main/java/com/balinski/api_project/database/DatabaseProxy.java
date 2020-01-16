@@ -12,10 +12,18 @@ public class DatabaseProxy {
     static String password;
 
     static {
-        loadDatabaseProperties();
+        try {
+            loadDatabaseProperties();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            System.err.println("Shutting the application...");
+            System.exit(-1);
+        }
     }
 
-    static Connection getDatabaseConnection() {
+    private DatabaseProxy(){}
+
+    public static Connection getDatabaseConnection() {
         Connection conn = null;
 
         try {
@@ -35,7 +43,13 @@ public class DatabaseProxy {
         }
     }
 
-    private static void loadDatabaseProperties() {
+    static void handleSqlException(SQLException e, String message) {
+        System.err.println(message);
+        System.err.println(e.getMessage());
+        System.err.println("SQL state: " + e.getSQLState());
+    }
+
+    private static void loadDatabaseProperties() throws IOException, NullPointerException, ClassNotFoundException {
         String pathToProperties = new File("server/src/main/resources/database.properties").getAbsolutePath();
 
         Properties props = null;
@@ -43,7 +57,7 @@ public class DatabaseProxy {
             props = new Properties();
             props.load(input);
         } catch (IOException e) {
-            handleConfigException(e, "Could not find or load database config file.");
+            throw new IOException("Could not find or load database config file.", e);
         }
 
         url = props.getProperty("url");
@@ -52,28 +66,15 @@ public class DatabaseProxy {
         password = props.getProperty("password");
 
         if(Stream.of(url, driver, username, password).anyMatch(Objects::isNull)) {
-            handleConfigException(null, "Cannot initialize database proxy: " +
-                    "one or more of properties (url, driver, username, password) is missing");
+            throw new NullPointerException("Cannot initialize database proxy: " +
+                    "One or more of properties (url, driver, username, password) is missing");
         }
 
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
-            handleConfigException(e, "Cannot initialize database proxy: driver class " + driver + " not found.");
+            throw new ClassNotFoundException("Cannot initialize database proxy: driver class "
+                    + driver + " not found.", e);
         }
-    }
-
-    static void handleSqlException(SQLException e, String message) {
-        System.err.println(message);
-        System.err.println(e.getMessage());
-        System.err.println("SQL state: " + e.getSQLState());
-    }
-
-    private static void handleConfigException(Exception e, String message) {
-        System.err.println(message);
-        if(e != null)
-            System.err.println(e.getMessage());
-        System.err.println("Shutting the application...");
-        System.exit(-1);
     }
 }

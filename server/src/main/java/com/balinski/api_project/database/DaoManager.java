@@ -1,29 +1,26 @@
 package com.balinski.api_project.database;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.sql.*;
+import java.util.*;
 
 public class DaoManager {
-    Connection connection;
 
-    public Set<Properties> query(String sql, String[] selectedFields) {
+    public List<Map<String, Object>> query(String sql) {
+
         try(Connection connection = DatabaseProxy.getDatabaseConnection()) {
             try(Statement statement = connection.createStatement()) {
-                try(ResultSet result = statement.executeQuery(sql)) {
-                    Set<Properties> data = new HashSet<>();
-                    Properties record = new Properties();
+                try(ResultSet rs = statement.executeQuery(sql)) {
+                    ResultSetMetaData md = rs.getMetaData();
+                    int columns = md.getColumnCount();
+                    List<Map<String, Object>> data = new LinkedList<>();
 
-                    while(result.next()) {
-                        for(var field : selectedFields) {
-                            record.put(field, result.getString(field));
-                        }
-                        data.add(record);
-                        record.clear();
+                    while(rs.next()) {
+                        Map<String, Object> row = new HashMap<>(columns);
+
+                        for(int i = 1; i <= columns; i++)
+                            row.put(md.getColumnName(i), rs.getObject(i));
+
+                        data.add(row);
                     }
 
                     return data;

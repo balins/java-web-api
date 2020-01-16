@@ -1,18 +1,19 @@
 package com.balinski.api_project;
 
 import com.balinski.api_project.database.DaoManager;
-import com.balinski.api_project.database.DatabaseProxy;
+
+import com.balinski.api_project.database.dao.DaoException;
+import com.balinski.api_project.database.model.Film;
 import com.balinski.api_project.server.JettyServer;
 
 import java.util.List;
-import java.util.Map;
 
 
 public class Main {
 
     public static void main(String[] args) {
         testDatabase();
-        //runApplication();
+//        runApplication();
     }
 
     static void runApplication() {
@@ -26,12 +27,12 @@ public class Main {
     }
 
     static void testDatabase() {
-        DatabaseProxy.getDatabaseConnection();
-        List<Map<String, Object>> result = new DaoManager().query("SELECT * FROM ACTOR;");
-
-        for(Map<String, Object> item : result) {
-            System.out.println(item.get("FIRST_NAME"));
+        try {
+            List<Film> list = new DaoManager().getFilmDao().getAvailableInLanguage("jaPANESE");
+            for(var actor : list)
+                System.out.println(actor.getTitle());
+        } catch (DaoException e) {
+            e.printStackTrace();
         }
     }
-
 }

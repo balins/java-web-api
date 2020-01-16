@@ -19,6 +19,14 @@ public class FilmDao extends Dao {
         super(manager, transaction);
     }
 
+    public Film getById(int id) {
+        List<Map<String, Object>> result = manager.queryGetData(
+                "SELECT * FROM FILM F WHERE F.FILM_ID = " + id + ";"
+        );
+
+        return result.size() > 0 ? toListOfFilms(result).get(0) : null;
+    }
+
     public List<Film> getByTitle(String title) {
         List<Map<String, Object>> result = manager.queryGetData(
                 "SELECT * FROM FILM F WHERE lower(F.TITLE) = '" + title.toLowerCase() + "';");
@@ -149,15 +157,6 @@ public class FilmDao extends Dao {
         );
 
         return toListOfFilms(result);
-    }
-
-    @Override
-    public Object getById(int id) {
-        List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.FILM_ID = " + id + ";"
-        );
-
-        return toListOfFilms(result).get(0);
     }
 
     @Override

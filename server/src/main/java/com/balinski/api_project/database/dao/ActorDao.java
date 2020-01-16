@@ -12,6 +12,14 @@ public class ActorDao extends Dao {
         super(manager, transaction);
     }
 
+    public Actor getById(int id) {
+        List<Map<String, Object>> result = manager.queryGetData(
+                "SELECT * FROM ACTOR A WHERE A.ACTOR_ID = " + id + ";"
+        );
+
+        return result.size() > 0 ? toListOfActors(result).get(0) : null;
+    }
+
     public List<Actor> getByFirstName(String firstName) {
         List<Map<String, Object>> result = manager.queryGetData(
                 "SELECT * FROM ACTOR A WHERE lower(A.FIRST_NAME) = '" + firstName.toLowerCase() + "';"
@@ -44,14 +52,6 @@ public class ActorDao extends Dao {
         );
 
         return toListOfActors(result);
-    }
-
-    public Object getById(int id) {
-        List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM ACTOR A WHERE A.ACTOR_ID = " + id + ";"
-        );
-
-        return toListOfActors(result).get(0);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.balinski.api_project.database.model;
 
 import java.time.LocalDateTime;
 
-public class Actor {
+public class Actor implements Jsonable {
     final int id;
     String firstName;
     String lastName;
@@ -41,5 +41,10 @@ public class Actor {
 
     public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public String toJson() {
+        return String.format("{\"id\":%d,\"firstName\":\"%s\",\"lastName\":\"%s\",\"lastUpdate\":\"%s\"}",
+                this.id, this.firstName, this.lastName, this.lastUpdate.toString());
     }
 }

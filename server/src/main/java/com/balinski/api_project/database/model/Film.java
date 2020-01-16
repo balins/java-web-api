@@ -3,7 +3,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class Film {
+public class Film implements Jsonable {
     final int id;
     String title;
     String description;
@@ -93,5 +93,14 @@ public class Film {
 
     public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public String toJson() {
+        return String.format("{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\",\"releaseYear\":\"%s\"," +
+                        "\"languageId\":%d,\"rentalDuration\":%d,\"rentalRate\":%s," +
+                        "\"length\":%d,\"lastUpdate\":\"%s\"}",
+                this.id, this.title, this.description, this.releaseYear.toString(),
+                this.languageId, this.getRentalDuration(), this.rentalRate.toPlainString(),
+                this.length, this.lastUpdate);
     }
 }

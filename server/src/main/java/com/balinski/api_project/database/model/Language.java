@@ -1,8 +1,9 @@
 package com.balinski.api_project.database.model;
 
+
 import java.time.LocalDateTime;
 
-public class Language {
+public class Language implements Jsonable {
     final int id;
     String name;
     LocalDateTime lastUpdate;
@@ -31,5 +32,10 @@ public class Language {
 
     public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public String toJson() {
+        return String.format("{\"id\":%d,\"name\":\"%s\",\"lastUpdate\":\"%s\"}",
+                    this.id, this.name, this.lastUpdate.toString());
     }
 }

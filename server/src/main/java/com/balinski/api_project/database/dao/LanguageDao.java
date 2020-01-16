@@ -12,6 +12,14 @@ public class LanguageDao extends Dao {
         super(manager, transaction);
     }
 
+    public Language getById(int id) {
+        List<Map<String, Object>> result = manager.queryGetData(
+                "SELECT * FROM LANGUAGE WHERE LANGUAGE_ID = " + id + ";"
+        );
+
+        return result.size() > 0 ? toListOfLanguages(result).get(0) : null;
+    }
+
     public List<Language> getByName(String name) {
         List<Map<String, Object>> result = manager.queryGetData(
                 "SELECT * FROM LANGUAGE L WHERE lower(L.NAME) = '" + name.toLowerCase() + "';"
@@ -36,15 +44,6 @@ public class LanguageDao extends Dao {
         );
 
         return toListOfLanguages(result);
-    }
-
-    @Override
-    public Object getById(int id) {
-        List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM LANGUAGE WHERE LANGUAGE_ID = " + id + ";"
-        );
-
-        return toListOfLanguages(result).get(0);
     }
 
     @Override

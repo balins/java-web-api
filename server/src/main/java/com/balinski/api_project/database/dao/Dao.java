@@ -20,7 +20,6 @@ abstract class Dao {
 
     public abstract Integer getCount();
     public abstract List<?> getAll();
-    public abstract Object getById(int id);
     public abstract List<?> getIdBetween(int start, int stop);
     public abstract int add(Object obj);
     public abstract int addAll(List<Object> list);

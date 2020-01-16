@@ -12,8 +12,8 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        testDatabase();
-//        runApplication();
+        //testDatabase();
+        runApplication();
     }
 
     static void runApplication() {

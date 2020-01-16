@@ -2,3 +2,5 @@
 *.iml
 /webapp/target
 /server/target
+server/src/main/resources/database.trace.db
+server/src/main/resources/database.h2.db

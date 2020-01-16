@@ -1,38 +1,115 @@
 package com.balinski.api_project.database;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import com.balinski.api_project.database.dao.ActorDao;
+import com.balinski.api_project.database.dao.DaoException;
+import com.balinski.api_project.database.dao.FilmDao;
+import com.balinski.api_project.database.dao.LanguageDao;
+import com.balinski.api_project.util.FilePropertiesLoader;
+import com.balinski.api_project.util.SqlExceptionPrinter;
+
+import java.io.IOException;
+import java.sql.*;
+import java.util.*;
 
 public class DaoManager {
-    Connection connection;
+    protected DataSourceWrapper dataSource;
 
-    public Set<Properties> query(String sql, String[] selectedFields) {
-        try(Connection connection = DatabaseProxy.getDatabaseConnection()) {
+    public DaoManager() throws DaoException {
+        try {
+            initDataSource("server/src/main/resources/database.properties");
+        } catch (IOException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    public ActorDao getActorDao() {
+        return new ActorDao(this, false);
+    }
+
+    public FilmDao getFilmDao() {
+        return new FilmDao(this, false);
+    }
+
+    public LanguageDao getLanguageDao() {
+        return new LanguageDao(this, false);
+    }
+
+    public ActorDao getActorDao(boolean transaction) {
+        return new ActorDao(this, transaction);
+    }
+
+    public FilmDao getFilmDao(boolean transaction) {
+        return new FilmDao(this, transaction);
+    }
+
+    public LanguageDao getLanguageDao (boolean transaction) {
+        return new LanguageDao(this, transaction);
+    }
+
+    public List<Map<String, Object>> queryGetData(String sql) {
+        List<Map<String, Object>> data = null;
+
+        try(Connection connection = getConnection()) {
             try(Statement statement = connection.createStatement()) {
-                try(ResultSet result = statement.executeQuery(sql)) {
-                    Set<Properties> data = new HashSet<>();
-                    Properties record = new Properties();
+                try(ResultSet rs = statement.executeQuery(sql)) {
+                    ResultSetMetaData md = rs.getMetaData();
+                    int columns = md.getColumnCount();
+                    data = new LinkedList<>();
 
-                    while(result.next()) {
-                        for(var field : selectedFields) {
-                            record.put(field, result.getString(field));
-                        }
-                        data.add(record);
-                        record.clear();
+                    while(rs.next()) {
+                        Map<String, Object> row = new HashMap<>(columns);
+
+                        for(int i = 1; i <= columns; i++)
+                            row.put(md.getColumnName(i), rs.getObject(i));
+
+                        data.add(row);
                     }
-
-                    return data;
                 }
             }
         } catch (SQLException e) {
-            DatabaseProxy.handleSqlException(e, "An error occurred when trying to query the database");
+            SqlExceptionPrinter.print("An error occurred when trying to query the database", e);
+        } finally {
+            closeConnection();
         }
 
-        return null;
+        return data;
     }
+
+    public int queryModify(String sql, boolean transaction) {
+        int rowsAffected = 0;
+
+        try(Connection connection = getConnection()) {
+            if(transaction)
+                connection.setAutoCommit(false);
+
+            try(Statement statement = connection.createStatement()) {
+               rowsAffected = statement.executeUpdate(sql);
+            }
+
+            if(transaction) {
+                connection.setAutoCommit(true);
+                connection.commit();
+            }
+        } catch (SQLException e) {
+            SqlExceptionPrinter.print("An error occurred when trying to query the database", e);
+        } finally {
+            closeConnection();
+        }
+
+        return rowsAffected;
+    }
+
+    public Connection getConnection() {
+        return dataSource.getConnection();
+    }
+
+    protected void closeConnection() {
+        dataSource.closeConnection();
+    }
+
+    protected void initDataSource(String path) throws IOException {
+        Properties dbProps = FilePropertiesLoader.load(path);
+        this.dataSource = new DataSourceWrapper(dbProps);
+    }
+
 }

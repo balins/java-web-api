@@ -45,8 +45,9 @@ public class Actor extends DatabaseModel {
 
     @Override
     public String asJson() {
-        return String.format("{\"id\":%d,\"firstName\":\"%s\",\"lastName\":\"%s\",\"lastUpdate\":\"%s\"}",
-                id, firstName, lastName, lastUpdate.format(toDateTime));
+        return String.format("{\"type\":\"%s\",\"id\":\"%d\",\"attributes\":" +
+                        "{\"firstName\":\"%s\",\"lastName\":\"%s\",\"lastUpdate\":\"%s\"}}",
+                "actors", id, firstName, lastName, lastUpdate.format(toDateTime));
     }
 
     @Override

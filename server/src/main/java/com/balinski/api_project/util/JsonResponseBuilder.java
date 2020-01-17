@@ -4,13 +4,13 @@ import com.balinski.api_project.database.model.DatabaseModel;
 
 import java.util.List;
 
-public class JsonHelper {
+public class JsonResponseBuilder {
     public static String mergeFromList(List<? extends DatabaseModel> list) {
         if(list == null) {
             return "{\"error\":true,\"data\":[]}";
         }
 
-        StringBuilder sb = new StringBuilder("{\"error\":false,\"data\":[");
+        StringBuilder sb = new StringBuilder("{\"errors\":false,\"data\":[");
 
         if(list.size() > 0) {
             for (var model : list)

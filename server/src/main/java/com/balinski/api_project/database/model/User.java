@@ -60,9 +60,10 @@ public class User extends DatabaseModel {
 
     @Override
     public String asJson(){
-        return String.format("{\"id\":%d,\"name\":\"%s\",\"token\":\"%s\",\"used\":%d,\"limit\":%d," +
-                        "\"dateRegistered\":%s,\"lastUpdate\":\"%s\"}",
-                id, name, token, used, limit, dateRegistered.format(toDate), lastUpdate.format(toDateTime));
+        return String.format("{\"type\":\"%s\",\"id\":\"%d\",\"attributes\":" +
+                        "{\"name\":\"%s\",\"token\":\"%s\",\"used\":\"%d\",\"limit\":\"%d\"," +
+                        "\"dateRegistered\":\"%s\",\"lastUpdate\":\"%s\"}}",
+                "users", id, name, token, used, limit, dateRegistered.format(toDate), lastUpdate.format(toDateTime));
     }
 
     @Override

@@ -20,9 +20,7 @@ public class ActorServlet extends HttpServlet {
             String response = JsonResponseBuilder.mergeFromList(actors);
             writer.print(response);
         } catch (DaoException e) {
-            writer.print("{\"errors\":true,\"data\":[]}");
-        } catch (NullPointerException e) {
-            writer.print("{\"errors\":false,\"data\":[]}");
+            writer.print("{\"errors\":\"true\",\"data\":[]}");
         }
     }
 }

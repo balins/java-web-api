@@ -11,7 +11,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        testDatabase();
+        //testDatabase();
         runApplication();
     }
 
@@ -27,7 +27,7 @@ public class Main {
 
     static void testDatabase() {
         try {
-            List<Film> list = new DaoManager().getFilmDao().getAvailableInLanguage("jaPANESE");
+            List<Film> list = new DaoManager().getFilmDao().getAll();
             for(var film : list)
                 System.out.println(film.getTitle());
         } catch (DaoException e) {

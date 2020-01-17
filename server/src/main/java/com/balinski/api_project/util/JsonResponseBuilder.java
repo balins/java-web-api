@@ -7,10 +7,10 @@ import java.util.List;
 public class JsonResponseBuilder {
     public static String mergeFromList(List<? extends DatabaseModel> list) {
         if(list == null) {
-            return "{\"error\":true,\"data\":[]}";
+            return "{\"errors\":\"true\",\"data\":[]}";
         }
 
-        StringBuilder sb = new StringBuilder("{\"errors\":false,\"data\":[");
+        StringBuilder sb = new StringBuilder("{\"errors\":\"false\",\"data\":[");
 
         if(list.size() > 0) {
             for (var model : list)

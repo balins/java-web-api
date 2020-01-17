@@ -10,14 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-
-public class ActorServlet extends HttpServlet {
+public class FilmServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setHeader("Content-Type", "application/vnd.api+json");
         PrintWriter writer = resp.getWriter();
         try {
-            var actors = new DaoManager().getActorDao().getAll();
-            String response = JsonResponseBuilder.mergeFromList(actors);
+            var films = new DaoManager().getFilmDao().getAll();
+            String response = JsonResponseBuilder.mergeFromList(films);
             writer.print(response);
         } catch (DaoException e) {
             writer.print("{\"errors\":[{\"title\":\"Internal server error\"," +

@@ -7,7 +7,8 @@ import java.util.List;
 public class JsonResponseBuilder {
     public static String mergeFromList(List<? extends DatabaseModel> list) {
         if(list == null) {
-            return "{\"errors\":\"true\",\"data\":[]}";
+            return "{\"errors\":[{\"title\":\"Internal server error\"," +
+                    "\"detail\":\"Could not obtain an instance of DAO for given model\"}],\"data\":[]}";
         }
 
         StringBuilder sb = new StringBuilder("{\"errors\":\"false\",\"data\":[");

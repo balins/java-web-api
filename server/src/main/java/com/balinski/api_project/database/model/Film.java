@@ -99,11 +99,11 @@ public class Film extends DatabaseModel {
     @Override
     public String asJson() {
         return String.format("{\"type\":\"%s\",\"id\":\"%d\",\"attributes\":" +
-                        "{\"title\":\"%s\",\"description\":\"%s\",\"releaseYear\":\"%s\",\"languageId\":\"%d\"," +
-                        "\"rentalDuration\":\"%d\",\"rentalRate\":\"%s\",\"length\":\"%d\",\"lastUpdate\":\"%s\"}}",
-                "films", id, title, description, releaseYear.format(toDate),
-                languageId, getRentalDuration(), rentalRate.toPlainString(),
-                length, lastUpdate.format(toDateTime));
+                        "{\"title\":\"%s\",\"description\":\"%s\",\"releaseYear\":\"%s\",\"rentalDuration\":\"%d\"," +
+                        "\"rentalRate\":\"%s\",\"length\":\"%d\",\"lastUpdate\":\"%s\"},\"relationships\":" +
+                        "{\"language\":\"data\":{\"type\":\"languages\",\"id\":\"%d\"}}}",
+                "films", id, title, description, releaseYear.format(toDate), rentalDuration,
+                rentalRate.toPlainString(), length, lastUpdate.format(toDateTime), languageId);
     }
 
     @Override

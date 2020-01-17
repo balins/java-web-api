@@ -7,14 +7,14 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class DataSourceWrapper {
+public class DatabaseProxy {
     private BasicDataSource dataSource;
     private Connection connection;
     private String url;
     private String username;
     private String password;
 
-    public DataSourceWrapper(Properties props) {
+    public DatabaseProxy(Properties props) {
         try {
             loadDatabaseProperties(props);
             initDataSource();

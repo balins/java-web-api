@@ -4,228 +4,130 @@ import com.balinski.api_project.database.DaoManager;
 import com.balinski.api_project.database.model.Film;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class FilmDao extends Dao {
+public class FilmDao extends Dao<Film> {
     static final DateTimeFormatter toDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public FilmDao(DaoManager manager, boolean transaction) {
-        super(manager, transaction);
+        super(manager, DaoType.FILM, transaction);
     }
 
     public List<Film> getByTitle(String title) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE lower(F.TITLE) = '" + title.toLowerCase() + "';");
+                String.format("SELECT * FROM FILM F WHERE lower(F.TITLE) = '%s';", title.toLowerCase())
+        );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getReleasedBetween(LocalDateTime start, LocalDateTime end) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RELEASE_YEAR BETWEEN TIMESTAMP '" + start.format(toDate) + "' " +
-                        "AND TIMESTAMP '" + end.format(toDate) + "';");
+                String.format("SELECT * FROM FILM F WHERE F.RELEASE_YEAR BETWEEN TIMESTAMP '%s' AND TIMESTAMP '%s';",
+                        start.format(toDate), end.format(toDate))
+        );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getReleasedBefore(LocalDateTime date) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RELEASE_YEAR < TIMESTAMP '" + date.format(toDate) + "';"
+                String.format("SELECT * FROM FILM F WHERE F.RELEASE_YEAR < TIMESTAMP '%s';", date.format(toDate))
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getReleasedAfter(LocalDateTime date) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RELEASE_YEAR > TIMESTAMP '" + date.format(toDate) + "';"
+                String.format("SELECT * FROM FILM F WHERE F.RELEASE_YEAR > TIMESTAMP '%s';", date.format(toDate))
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getAvailableInLanguage(String language) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT F.* FROM (" +
-                        "FILM F JOIN LANGUAGE L ON F.LANGUAGE_ID = L.LANGUAGE_ID" +
-                    ") WHERE lower(NAME) = '"
-                        + language.toLowerCase() + "';"
+                String.format("SELECT F.* FROM (FILM F JOIN LANGUAGE L ON F.LANGUAGE_ID = L.LANGUAGE_ID" +
+                    ") WHERE lower(NAME) = '%s';", language.toLowerCase())
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
-    public List<Film> getWithRentalRateBetween(float min, float max) {
+    public List<Film> getWithRentalRateBetween(BigDecimal min, BigDecimal max) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RENTAL_RATE BETWEEN " + min + " AND " + max + ";"
+                String.format("SELECT * FROM FILM F WHERE F.RENTAL_RATE BETWEEN %s AND %s;",
+                        min.toPlainString(), max.toPlainString())
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
-    public List<Film> getWithLowerRentalRateThan(float rate) {
+    public List<Film> getWithLowerRentalRateThan(BigDecimal rate) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RENTAL_RATE < " + rate + ";"
+                String.format("SELECT * FROM FILM F WHERE F.RENTAL_RATE < %s;", rate.toPlainString())
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
-    public List<Film> getWithGreaterRentalRateThan(float rate) {
+    public List<Film> getWithGreaterRentalRateThan(BigDecimal rate) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RENTAL_RATE > " + rate + ";"
+                String.format("SELECT * FROM FILM F WHERE F.RENTAL_RATE > %s;", rate.toPlainString())
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getWithRentalDurationBetween(int min, int max) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RENTAL_DURATION BETWEEN " + min + " AND " + max + ";"
+                String.format("SELECT * FROM FILM F WHERE F.RENTAL_DURATION BETWEEN %d AND %d;", min, max)
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getWithShorterRentalDurationThan(int duration) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RENTAL_DURATION < " + duration + ";"
+                String.format("SELECT * FROM FILM F WHERE F.RENTAL_DURATION < %d;", duration)
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getWithGreaterRentalDurationThan(int duration) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.RENTAL_DURATION > " + duration + ";"
+                String.format("SELECT * FROM FILM F WHERE F.RENTAL_DURATION > %d;", duration)
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getWithLengthBetween(int min, int max) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.LENGTH BETWEEN " + min + " AND " + max + ";"
+                String.format("SELECT * FROM FILM F WHERE F.LENGTH BETWEEN %d AND %d;", min, max)
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getShorterThan(int minutes) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.LENGTH < " + minutes + ";"
+                String.format("SELECT * FROM FILM F WHERE F.LENGTH < %d;", minutes)
         );
 
-        return toListOfFilms(result);
+        return toListOfObjects(result);
     }
 
     public List<Film> getLongerThan(int minutes) {
         List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.LENGTH > " + minutes + ";"
+                String.format("SELECT * FROM FILM F WHERE F.LENGTH > %d;", minutes)
         );
 
-        return toListOfFilms(result);
-    }
-
-    @Override
-    public Integer getCount() {
-        List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT COUNT(*) AS COUNT FROM FILM;"
-        );
-
-        return ((Long)result.get(0).get("COUNT")).intValue();
-    }
-
-    @Override
-    public List<Film> getAll() {
-        List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM;"
-        );
-
-        return toListOfFilms(result);
-    }
-
-    @Override
-    public Object getById(int id) {
-        List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.FILM_ID = " + id + ";"
-        );
-
-        return toListOfFilms(result).get(0);
-    }
-
-    @Override
-    public List<Film> getIdBetween(int start, int stop) {
-        List<Map<String, Object>> result = manager.queryGetData(
-                "SELECT * FROM FILM F WHERE F.FILM_ID BETWEEN " + start + " AND " + stop + ";"
-        );
-
-        return toListOfFilms(result);
-    }
-
-    @Override
-    public int add(Object obj) {
-        if(!(obj instanceof Film))
-            return 0;
-
-        Film film = (Film) obj;
-
-        String sql = String.format("INSERT INTO FILM VALUES (%d, '%s', '%s', TIMESTAMP '%s', %d, null," +
-                        " %d, %s, %d, null, null, null, TIMESTAMP '%s');",
-                    film.getId(), film.getTitle(), film.getDescription(), film.getReleaseYear().format(toDate),
-                    film.getLanguageId(), film.getRentalDuration(), film.getRentalRate().toPlainString(),
-                    film.getLength(), film.getLastUpdate().format(toDateTime));
-
-        int rowsAdded = manager.queryModify(sql, transaction);
-        count += rowsAdded;
-
-        return rowsAdded;
-    }
-
-    @Override
-    public int addAll(List<Object> list) {
-        if(list == null || list.size() == 0)
-            return 0;
-
-        StringBuilder sql = new StringBuilder("INSERT INTO FILM VALUES ");
-
-        for(Object obj : list) {
-            Film film = (Film) obj;
-
-            sql.append(String.format("(%d, '%s', '%s', TIMESTAMP '%s', %d, null," +
-                            " %d, %s, %d, null, null, null, TIMESTAMP '%s'), ",
-                    film.getId(), film.getTitle(), film.getDescription(), film.getReleaseYear().format(toDate),
-                    film.getLanguageId(), film.getRentalDuration(), film.getRentalRate().toPlainString(),
-                    film.getLength(), film.getLastUpdate().format(toDateTime)));
-        }
-
-        sql.replace(sql.lastIndexOf(", "), sql.length(), ";");
-
-        int rowsAdded = manager.queryModify(sql.toString(), transaction);
-        count += rowsAdded;
-
-        return rowsAdded;
-    }
-
-    public List<Film> toListOfFilms(List<Map<String, Object>> listOfMaps) {
-        if(listOfMaps == null)
-            return null;
-
-        List<Film> listOfFilms = new ArrayList<>(listOfMaps.size());
-
-        for(var film : listOfMaps) {
-            listOfFilms.add(new Film((int)film.get("FILM_ID"), (String)film.get("TITLE"),
-                    (String)film.get("DESCRIPTION"), ((Date)film.get("RELEASE_YEAR")).toLocalDate(),
-                    (int)film.get("LANGUAGE_ID"), (int)film.get("RENTAL_DURATION"), (BigDecimal)film.get("RENTAL_RATE"),
-                    (int)film.get("LENGTH"), ((Timestamp)film.get("LAST_UPDATE")).toLocalDateTime()));
-        }
-
-        return listOfFilms;
+        return toListOfObjects(result);
     }
 }

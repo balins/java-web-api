@@ -1,9 +1,10 @@
 package com.balinski.api_project.database.model;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class Film {
+public class Film extends DatabaseModel {
     final int id;
     String title;
     String description;
@@ -93,5 +94,22 @@ public class Film {
 
     public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    @Override
+    public String asJson() {
+        return String.format("{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\",\"releaseYear\":\"%s\"," +
+                        "\"languageId\":%d,\"rentalDuration\":%d,\"rentalRate\":%s,\"length\":%d,\"lastUpdate\":\"%s\"}",
+                id, title, description, releaseYear.format(toDate),
+                languageId, getRentalDuration(), rentalRate.toPlainString(),
+                length, lastUpdate.format(toDateTime));
+    }
+
+    @Override
+    public String asCsv() {
+        return String.format("'%s', '%s', TIMESTAMP '%s', %d, %d, %s, %d, TIMESTAMP '%s'",
+                title, description, releaseYear.format(toDate),
+                languageId, rentalDuration, rentalRate.toPlainString(), length,
+                lastUpdate.format(toDateTime));
     }
 }

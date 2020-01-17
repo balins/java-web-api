@@ -1,9 +1,6 @@
 package com.balinski.api_project.database;
 
-import com.balinski.api_project.database.dao.ActorDao;
-import com.balinski.api_project.database.dao.DaoException;
-import com.balinski.api_project.database.dao.FilmDao;
-import com.balinski.api_project.database.dao.LanguageDao;
+import com.balinski.api_project.database.dao.*;
 import com.balinski.api_project.util.FilePropertiesLoader;
 import com.balinski.api_project.util.SqlExceptionPrinter;
 
@@ -12,7 +9,7 @@ import java.sql.*;
 import java.util.*;
 
 public class DaoManager {
-    protected DataSourceWrapper dataSource;
+    protected DatabaseProxy databaseProxy;
 
     public DaoManager() throws DaoException {
         try {
@@ -34,6 +31,10 @@ public class DaoManager {
         return new LanguageDao(this, false);
     }
 
+    public UserDao getUserDao() {
+        return new UserDao(this, false);
+    }
+
     public ActorDao getActorDao(boolean transaction) {
         return new ActorDao(this, transaction);
     }
@@ -44,6 +45,10 @@ public class DaoManager {
 
     public LanguageDao getLanguageDao (boolean transaction) {
         return new LanguageDao(this, transaction);
+    }
+
+    public UserDao getUserDao (boolean transaction) {
+        return new UserDao(this, transaction);
     }
 
     public List<Map<String, Object>> queryGetData(String sql) {
@@ -100,16 +105,16 @@ public class DaoManager {
     }
 
     public Connection getConnection() {
-        return dataSource.getConnection();
+        return databaseProxy.getConnection();
     }
 
     protected void closeConnection() {
-        dataSource.closeConnection();
+        databaseProxy.closeConnection();
     }
 
     protected void initDataSource(String path) throws IOException {
         Properties dbProps = FilePropertiesLoader.load(path);
-        this.dataSource = new DataSourceWrapper(dbProps);
+        this.databaseProxy = new DatabaseProxy(dbProps);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.balinski.api_project.server.handler;
 
-import com.balinski.api_project.servlet.SimpleServlet;
+import com.balinski.api_project.servlet.ActorServlet;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.*;
@@ -21,7 +21,7 @@ public class WebAppContextWrapper {
     }
 
     private void registerServlets() {
-        context.addServlet(SimpleServlet.class, "/simple");
+        context.addServlet(ActorServlet.class, "/actors");
     }
 
 }

@@ -2,7 +2,7 @@ package com.balinski.api_project.database.model;
 
 import java.time.LocalDateTime;
 
-public class Language {
+public class Language extends DatabaseModel {
     final int id;
     String name;
     LocalDateTime lastUpdate;
@@ -31,5 +31,17 @@ public class Language {
 
     public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    @Override
+    public String asJson() {
+        return String.format("{\"id\":%d,\"name\":\"%s\",\"lastUpdate\":\"%s\"}",
+                    id, name, lastUpdate.format(toDateTime));
+    }
+
+    @Override
+    public String asCsv() {
+        return String.format("'%s', TIMESTAMP '%s'",
+                name, lastUpdate.format(toDateTime));
     }
 }

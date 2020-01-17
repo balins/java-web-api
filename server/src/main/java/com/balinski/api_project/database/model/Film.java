@@ -1,9 +1,13 @@
 package com.balinski.api_project.database.model;
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
-public class Film implements Jsonable {
+public class Film implements Jsonable, DatabaseModel {
     final int id;
     String title;
     String description;
@@ -95,6 +99,7 @@ public class Film implements Jsonable {
         this.lastUpdate = lastUpdate;
     }
 
+    @Override
     public String toJson() {
         return String.format("{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\",\"releaseYear\":\"%s\"," +
                         "\"languageId\":%d,\"rentalDuration\":%d,\"rentalRate\":%s," +
@@ -102,5 +107,13 @@ public class Film implements Jsonable {
                 this.id, this.title, this.description, this.releaseYear.toString(),
                 this.languageId, this.getRentalDuration(), this.rentalRate.toPlainString(),
                 this.length, this.lastUpdate);
+    }
+
+    @Override
+    public String asTuple() {
+        return String.format("'%s', '%s', TIMESTAMP '%s', %d, %d, %s, %d, TIMESTAMP '%s')",
+                title, description, releaseYear.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                languageId, rentalDuration, rentalRate.toPlainString(), length,
+                lastUpdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 }

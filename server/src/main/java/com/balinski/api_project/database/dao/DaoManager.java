@@ -1,6 +1,6 @@
-package com.balinski.api_project.database;
+package com.balinski.api_project.database.dao;
 
-import com.balinski.api_project.database.dao.*;
+import com.balinski.api_project.database.DataSourceWrapper;
 import com.balinski.api_project.util.FilePropertiesLoader;
 import com.balinski.api_project.util.SqlExceptionPrinter;
 

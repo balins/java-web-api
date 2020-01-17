@@ -1,8 +1,11 @@
 package com.balinski.api_project.database.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
-public class User {
+public class User implements DatabaseModel {
     final int id;
     final String name;
     final String token;
@@ -56,5 +59,13 @@ public class User {
 
     public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    @Override
+    public String asTuple() {
+        return String.format("('%s', '%s', %d, %d, TIMESTAMP '%s', TIMESTAMP '%s')",
+                name, token, used, limit,
+                dateRegistered.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                lastUpdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 }

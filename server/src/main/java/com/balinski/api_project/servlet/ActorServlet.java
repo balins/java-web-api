@@ -1,6 +1,6 @@
 package com.balinski.api_project.servlet;
 
-import com.balinski.api_project.database.DaoManager;
+import com.balinski.api_project.database.dao.DaoManager;
 import com.balinski.api_project.database.dao.DaoException;
 import com.balinski.api_project.database.model.Actor;
 import com.balinski.api_project.util.JsonHelper;

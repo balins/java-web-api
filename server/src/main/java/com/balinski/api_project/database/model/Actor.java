@@ -1,8 +1,10 @@
 package com.balinski.api_project.database.model;
 
-import java.time.LocalDateTime;
 
-public class Actor implements Jsonable {
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Actor implements Jsonable, DatabaseModel {
     final int id;
     String firstName;
     String lastName;
@@ -43,8 +45,15 @@ public class Actor implements Jsonable {
         this.lastUpdate = lastUpdate;
     }
 
+    @Override
     public String toJson() {
         return String.format("{\"id\":%d,\"firstName\":\"%s\",\"lastName\":\"%s\",\"lastUpdate\":\"%s\"}",
                 this.id, this.firstName, this.lastName, this.lastUpdate.toString());
+    }
+
+    @Override
+    public String asTuple() {
+        return String.format("('%s', '%s', TIMESTAMP '%s')",
+                firstName, lastName, lastUpdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 }

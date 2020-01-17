@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 
 public class ActorServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setHeader("Content-Type", "application/json;charset=utf-8");
         PrintWriter writer = resp.getWriter();
         try {
             var actors = new DaoManager().getActorDao().getAll();

@@ -1,16 +1,17 @@
 package com.balinski.api_project.database.dao;
 
 
-import com.balinski.api_project.database.model.DatabaseModel;
+import com.balinski.api_project.database.DaoManager;
+import com.balinski.api_project.database.model.Language;
 
 import java.util.*;
 
-public class LanguageDao extends Dao {
+public class LanguageDao extends Dao<Language> {
     public LanguageDao(DaoManager manager, boolean transaction) {
-        super(manager, ModelType.LANGUAGE, transaction);
+        super(manager, DaoType.LANGUAGE, transaction);
     }
 
-    public List<? super DatabaseModel> getByName(String name) {
+    public List<Language> getByName(String name) {
         List<Map<String, Object>> result = manager.queryGetData(
                 String.format("SELECT * FROM LANGUAGE L WHERE lower(L.NAME) = '%s';", name.toLowerCase())
         );

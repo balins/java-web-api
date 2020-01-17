@@ -1,13 +1,10 @@
 package com.balinski.api_project.database.model;
+
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
-public class Film implements Jsonable, DatabaseModel {
+public class Film extends DatabaseModel {
     final int id;
     String title;
     String description;
@@ -100,20 +97,19 @@ public class Film implements Jsonable, DatabaseModel {
     }
 
     @Override
-    public String toJson() {
+    public String asJson() {
         return String.format("{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\",\"releaseYear\":\"%s\"," +
-                        "\"languageId\":%d,\"rentalDuration\":%d,\"rentalRate\":%s," +
-                        "\"length\":%d,\"lastUpdate\":\"%s\"}",
-                this.id, this.title, this.description, this.releaseYear.toString(),
-                this.languageId, this.getRentalDuration(), this.rentalRate.toPlainString(),
-                this.length, this.lastUpdate);
+                        "\"languageId\":%d,\"rentalDuration\":%d,\"rentalRate\":%s,\"length\":%d,\"lastUpdate\":\"%s\"}",
+                id, title, description, releaseYear.format(toDate),
+                languageId, getRentalDuration(), rentalRate.toPlainString(),
+                length, lastUpdate.format(toDateTime));
     }
 
     @Override
-    public String asTuple() {
-        return String.format("'%s', '%s', TIMESTAMP '%s', %d, %d, %s, %d, TIMESTAMP '%s')",
-                title, description, releaseYear.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+    public String asCsv() {
+        return String.format("'%s', '%s', TIMESTAMP '%s', %d, %d, %s, %d, TIMESTAMP '%s'",
+                title, description, releaseYear.format(toDate),
                 languageId, rentalDuration, rentalRate.toPlainString(), length,
-                lastUpdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                lastUpdate.format(toDateTime));
     }
 }

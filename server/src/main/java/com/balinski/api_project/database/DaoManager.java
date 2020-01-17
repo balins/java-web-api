@@ -1,6 +1,6 @@
-package com.balinski.api_project.database.dao;
+package com.balinski.api_project.database;
 
-import com.balinski.api_project.database.DataSourceWrapper;
+import com.balinski.api_project.database.dao.*;
 import com.balinski.api_project.util.FilePropertiesLoader;
 import com.balinski.api_project.util.SqlExceptionPrinter;
 
@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.*;
 
 public class DaoManager {
-    protected DataSourceWrapper dataSource;
+    protected DatabaseProxy databaseProxy;
 
     public DaoManager() throws DaoException {
         try {
@@ -105,16 +105,16 @@ public class DaoManager {
     }
 
     public Connection getConnection() {
-        return dataSource.getConnection();
+        return databaseProxy.getConnection();
     }
 
     protected void closeConnection() {
-        dataSource.closeConnection();
+        databaseProxy.closeConnection();
     }
 
     protected void initDataSource(String path) throws IOException {
         Properties dbProps = FilePropertiesLoader.load(path);
-        this.dataSource = new DataSourceWrapper(dbProps);
+        this.databaseProxy = new DatabaseProxy(dbProps);
     }
 
 }

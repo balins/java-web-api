@@ -1,11 +1,8 @@
 package com.balinski.api_project.database.model;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
-public class User implements DatabaseModel {
+public class User extends DatabaseModel {
     final int id;
     final String name;
     final String token;
@@ -62,10 +59,15 @@ public class User implements DatabaseModel {
     }
 
     @Override
-    public String asTuple() {
-        return String.format("('%s', '%s', %d, %d, TIMESTAMP '%s', TIMESTAMP '%s')",
-                name, token, used, limit,
-                dateRegistered.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-                lastUpdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+    public String asJson(){
+        return String.format("{\"id\":%d,\"name\":\"%s\",\"token\":\"%s\",\"used\":%d,\"limit\":%d," +
+                        "\"dateRegistered\":%s,\"lastUpdate\":\"%s\"}",
+                id, name, token, used, limit, dateRegistered.format(toDate), lastUpdate.format(toDateTime));
+    }
+
+    @Override
+    public String asCsv() {
+        return String.format("'%s', '%s', %d, %d, TIMESTAMP '%s', TIMESTAMP '%s'",
+                name, token, used, limit, dateRegistered.format(toDate), lastUpdate.format(toDateTime));
     }
 }

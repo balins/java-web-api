@@ -1,19 +1,16 @@
 package com.balinski.api_project.database.dao;
 
+import com.balinski.api_project.database.DaoManager;
 import com.balinski.api_project.database.model.*;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-abstract class Dao {
+abstract class Dao<T extends DatabaseModel> {
     protected DaoManager manager;
     protected boolean transaction;
-    protected ModelType type;
-    protected static final DateTimeFormatter toDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    protected DaoType type;
 
-    protected Dao(DaoManager manager, ModelType type, boolean transaction) {
+    protected Dao(DaoManager manager, DaoType type, boolean transaction) {
         this.manager = manager;
         this.type = type;
         this.transaction = transaction;
@@ -27,7 +24,7 @@ abstract class Dao {
         return ((Long)result.get(0).get("COUNT")).intValue();
     }
 
-    public Object getById(int id) {
+    public T getById(int id) {
         List<Map<String, Object>> result = manager.queryGetData(
                 String.format("SELECT * FROM %s T WHERE T.%s_ID = %d;", type.toString(), type.toString(), id)
         );
@@ -35,7 +32,7 @@ abstract class Dao {
         return result.size() > 0 ? toListOfObjects(result).get(0) : null;
     }
 
-    public List<? super DatabaseModel> getAll() {
+    public List<T> getAll() {
         List<Map<String, Object>> result = manager.queryGetData(
                 String.format("SELECT * FROM %s;", type.toString())
         );
@@ -43,7 +40,7 @@ abstract class Dao {
         return toListOfObjects(result);
     }
 
-    public List<? super DatabaseModel> getIdBetween(int start, int stop) {
+    public List<T> getIdBetween(int start, int stop) {
         List<Map<String, Object>> result = manager.queryGetData(
                 String.format("SELECT * FROM %s T WHERE T.%s_ID BETWEEN %d AND %d;",
                         type.toString(), type.toString(), start, stop)
@@ -52,18 +49,16 @@ abstract class Dao {
         return toListOfObjects(result);
     }
 
-    public int add(Object obj) {
-        if(!(obj instanceof DatabaseModel))
+    public int add(T obj) {
+        if(obj == null)
             return 0;
 
-        DatabaseModel model = (DatabaseModel) obj;
-
-        String sql = String.format("INSERT INTO %s VALUES %s;", type.toString(), model.asTuple());
+        String sql = String.format("INSERT INTO %s VALUES (%s);", type.toString(), obj.asCsv());
 
         return manager.queryModify(sql, transaction);
     }
 
-    public int addAll(List<? super DatabaseModel> list) {
+    public int addAll(List<T> list) {
         if(list == null || list.size() == 0)
             return 0;
 
@@ -72,7 +67,7 @@ abstract class Dao {
         for(Object obj : list) {
             DatabaseModel model = (DatabaseModel) obj;
 
-            sql.append(String.format("%s, ", model.asTuple()));
+            sql.append(String.format("(%s), ", model.asCsv()));
         }
 
         sql.replace(sql.lastIndexOf(", "), sql.length(), ";");
@@ -80,14 +75,16 @@ abstract class Dao {
         return manager.queryModify(sql.toString(), transaction);
     }
 
-    protected List<? super DatabaseModel> toListOfObjects(List<Map<String, Object>> listOfMaps) {
+    protected List<T> toListOfObjects(List<Map<String, Object>> listOfMaps) {
         if(listOfMaps == null)
             return null;
 
-        List<? super DatabaseModel> listOfObjects = new ArrayList<>(listOfMaps.size());
+        List<T> listOfObjects = new ArrayList<>(listOfMaps.size());
+
+        ModelFactory<T> factory = new ModelFactory<>();
 
         for(var map : listOfMaps)
-            listOfObjects.add(ModelFactory.getModel(type, map));
+            listOfObjects.add(factory.getModel(type, map));
 
         return listOfObjects;
     }

@@ -1,11 +1,11 @@
 package com.balinski.api_project.util;
 
-import com.balinski.api_project.database.model.Jsonable;
+import com.balinski.api_project.database.model.DatabaseModel;
 
 import java.util.List;
 
 public class JsonHelper {
-    public static String mergeFromList(List<? extends Jsonable> list) {
+    public static String mergeFromList(List<? extends DatabaseModel> list) {
         if(list == null) {
             return "{\"error\":true,\"data\":[]}";
         }
@@ -13,8 +13,8 @@ public class JsonHelper {
         StringBuilder sb = new StringBuilder("{\"error\":false,\"data\":[");
 
         if(list.size() > 0) {
-            for (var jsonable : list)
-                sb.append(jsonable.toJson()).append(",");
+            for (var model : list)
+                sb.append(model.asJson()).append(",");
 
             sb.setLength(sb.length() - 1);
         }

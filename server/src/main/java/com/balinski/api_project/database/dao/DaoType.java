@@ -1,11 +1,11 @@
 package com.balinski.api_project.database.dao;
 
-public enum ModelType {
+public enum DaoType {
     ACTOR("ACTOR"), FILM("FILM"), LANGUAGE("LANGUAGE"), USER("USER");
 
     private String tableName;
 
-    ModelType(String tableName) {
+    DaoType(String tableName) {
         this.tableName = tableName;
     }
 

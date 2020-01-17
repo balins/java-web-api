@@ -1,6 +1,6 @@
 package com.balinski.api_project;
 
-import com.balinski.api_project.database.dao.DaoManager;
+import com.balinski.api_project.database.DaoManager;
 
 import com.balinski.api_project.database.dao.DaoException;
 import com.balinski.api_project.database.model.Film;
@@ -8,11 +8,10 @@ import com.balinski.api_project.server.JettyServer;
 
 import java.util.List;
 
-
 public class Main {
 
     public static void main(String[] args) {
-        //testDatabase();
+        testDatabase();
         runApplication();
     }
 
@@ -29,8 +28,8 @@ public class Main {
     static void testDatabase() {
         try {
             List<Film> list = new DaoManager().getFilmDao().getAvailableInLanguage("jaPANESE");
-            for(var actor : list)
-                System.out.println(actor.getTitle());
+            for(var film : list)
+                System.out.println(film.getTitle());
         } catch (DaoException e) {
             e.printStackTrace();
         }

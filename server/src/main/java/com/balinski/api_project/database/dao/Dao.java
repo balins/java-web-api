@@ -5,18 +5,16 @@ import com.balinski.api_project.database.model.*;
 import java.util.*;
 
 abstract class Dao<T extends DatabaseModel> {
-    protected DaoManager manager;
     protected boolean transaction;
     protected DaoType type;
 
-    protected Dao(DaoManager manager, DaoType type, boolean transaction) {
-        this.manager = manager;
+    protected Dao(DaoType type, boolean transaction) {
         this.type = type;
         this.transaction = transaction;
     }
 
     public int getCount() throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                     String.format("SELECT COUNT(*) AS COUNT FROM %s;", type.toString())
         );
 
@@ -24,7 +22,7 @@ abstract class Dao<T extends DatabaseModel> {
     }
 
     public T getById(int id) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                     String.format("SELECT * FROM %s T WHERE T.%s_ID = %d;", type.toString(), type.toString(), id)
             );
 
@@ -32,15 +30,15 @@ abstract class Dao<T extends DatabaseModel> {
     }
 
     public List<T> getAll() throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
-                    String.format("SELECT * FROM %sa;", type.toString())
+        List<Map<String, Object>> result = DaoManager.getData(
+                    String.format("SELECT * FROM %s;", type.toString())
         );
 
         return toListOfObjects(result);
     }
 
     public List<T> getIdBetween(int start, int stop) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                     String.format("SELECT * FROM %s T WHERE T.%s_ID BETWEEN %d AND %d;",
                             type.toString(), type.toString(), start, stop)
         );
@@ -54,7 +52,7 @@ abstract class Dao<T extends DatabaseModel> {
 
         String sql = String.format("INSERT INTO %s VALUES (%s);", type.toString(), obj.asCsv());
 
-        return manager.modifyData(sql, transaction);
+        return DaoManager.modifyData(sql, transaction);
     }
 
     public int addAll(List<T> list) throws DaoException {
@@ -71,7 +69,7 @@ abstract class Dao<T extends DatabaseModel> {
 
         sql.replace(sql.lastIndexOf(", "), sql.length(), ";");
 
-        return manager.modifyData(sql.toString(), transaction);
+        return DaoManager.modifyData(sql.toString(), transaction);
     }
 
     protected List<T> toListOfObjects(List<Map<String, Object>> listOfMaps) throws DaoException {

@@ -18,7 +18,7 @@ public class UserServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
 
         try {
-            List<User> users = new DaoManager().getUserDao().getAll();
+            List<User> users = DaoManager.getUserDao().getAll();
             String response = JsonResponseBuilder.mergeFromList(users);
             writer.print(response);
         } catch (DaoException e) {

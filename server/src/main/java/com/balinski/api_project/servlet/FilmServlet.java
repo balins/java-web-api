@@ -18,7 +18,7 @@ public class FilmServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
 
         try {
-            List<Film> films = new DaoManager().getFilmDao().getAll();
+            List<Film> films = DaoManager.getFilmDao().getAll();
             String response = JsonResponseBuilder.mergeFromList(films);
             writer.print(response);
         } catch (DaoException e) {

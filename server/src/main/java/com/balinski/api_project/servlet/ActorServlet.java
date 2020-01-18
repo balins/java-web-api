@@ -18,14 +18,14 @@ public class ActorServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setHeader("Content-Type", "application/vnd.api+json");
         PrintWriter writer = resp.getWriter();
-
         try {
-            List<Actor> actors = new DaoManager().getActorDao().getAll();
+            List<Actor> actors = DaoManager.getActorDao().getAll();
             String response = JsonResponseBuilder.mergeFromList(actors);
             writer.print(response);
         } catch (DaoException e) {
             System.err.println("An error occured in ActorServlet: " + e.getMessage());
             writer.print(JsonResponseBuilder.getErrorJson(e));
+            e.printStackTrace();
         }
     }
 }

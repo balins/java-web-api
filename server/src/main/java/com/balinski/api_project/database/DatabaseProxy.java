@@ -8,21 +8,23 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class DatabaseProxy {
-    protected BasicDataSource dataSource;
-    protected Connection connection;
-    protected String driver;
-    protected String url;
-    protected String username;
-    protected String password;
+    protected static BasicDataSource dataSource;
+    protected static Connection connection;
+    protected static String driver;
+    protected static String url;
+    protected static String username;
+    protected static String password;
 
-    public DatabaseProxy() throws DatabaseException {
+    static {
         loadDatabaseProperties("server/src/main/resources/database.properties");
         loadDriver();
         testConnection();
         initDataSource();
     }
 
-    public List<Map<String, Object>> querySelect(String sql) throws DatabaseException {
+    private DatabaseProxy(){};
+
+    public static List<Map<String, Object>> querySelect(String sql) throws DatabaseException {
         List<Map<String, Object>> data;
 
         try(Connection connection = getConnection()) {
@@ -51,7 +53,7 @@ public class DatabaseProxy {
         return data;
     }
 
-    public int queryUpdate(String sql, boolean transaction) throws DatabaseException {
+    public static int queryUpdate(String sql, boolean transaction) throws DatabaseException {
         int rowsAffected = 0;
 
         try(Connection connection = getConnection()) {
@@ -75,28 +77,28 @@ public class DatabaseProxy {
         return rowsAffected;
     }
 
-    protected Connection getConnection() throws DatabaseException {
+    protected static Connection getConnection() throws DatabaseException {
         try {
-            this.connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
         } catch (SQLException e) {
             throw new DatabaseException("Could not obtain an instance of connection from given data source.", e);
         }
 
-        return this.connection;
+        return connection;
     }
 
-    protected void closeConnection() throws DatabaseException {
-        if(this.connection == null)
+    protected static void closeConnection() throws DatabaseException {
+        if(connection == null)
             return;
 
         try {
-            this.connection.close();
+            connection.close();
         } catch (SQLException e) {
             throw new DatabaseException("Cannot close the connection.", e);
         }
     }
 
-    private void testConnection() throws DatabaseException {
+    private static void testConnection() throws DatabaseException {
         if(Stream.of(url, driver, username, password).anyMatch(Objects::isNull)) {
             throw new DatabaseException("One of the database properties (url, driver, username, password) is missing. " +
                     "Check the file containing database properties.");
@@ -109,7 +111,7 @@ public class DatabaseProxy {
         }
     }
 
-    protected void initDataSource() {
+    protected static void initDataSource() {
         dataSource = new BasicDataSource();
         dataSource.setUrl(url);
         dataSource.setUsername(username);
@@ -119,7 +121,7 @@ public class DatabaseProxy {
         dataSource.setMaxOpenPreparedStatements(100);
     }
 
-    protected void loadDatabaseProperties(String path) throws DatabaseException {
+    protected static void loadDatabaseProperties(String path) throws DatabaseException {
         Properties props;
         try {
             props = FilePropertiesLoader.load(path);
@@ -134,7 +136,7 @@ public class DatabaseProxy {
         password = props.getProperty("password");
     }
 
-    private void loadDriver() throws DatabaseException {
+    private static void loadDriver() throws DatabaseException {
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {

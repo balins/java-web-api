@@ -27,7 +27,7 @@ public class Main {
 
     static void testDatabase() {
         try {
-            List<Film> list = new DaoManager().getFilmDao().getAll();
+            List<Film> list = DaoManager.getFilmDao().getAll();
             for(var film : list)
                 System.out.println(film.getTitle());
         } catch (DaoException e) {

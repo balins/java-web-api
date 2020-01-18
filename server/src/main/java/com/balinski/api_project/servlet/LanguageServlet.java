@@ -18,7 +18,7 @@ public class LanguageServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
 
         try {
-            List<Language> languages = new DaoManager().getLanguageDao().getAll();
+            List<Language> languages = DaoManager.getLanguageDao().getAll();
             String response = JsonResponseBuilder.mergeFromList(languages);
             writer.print(response);
         } catch (DaoException e) {

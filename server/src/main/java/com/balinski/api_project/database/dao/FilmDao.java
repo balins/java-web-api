@@ -11,12 +11,12 @@ import java.util.Map;
 public class FilmDao extends Dao<Film> {
     static final DateTimeFormatter toDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public FilmDao(DaoManager manager, boolean transaction) {
-        super(manager, DaoType.FILM, transaction);
+    public FilmDao(boolean transaction) {
+        super(DaoType.FILM, transaction);
     }
 
     public List<Film> getByTitle(String title) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE lower(F.TITLE) = '%s';", title.toLowerCase())
         );
 
@@ -24,7 +24,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getReleasedBetween(LocalDateTime start, LocalDateTime end) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RELEASE_YEAR BETWEEN TIMESTAMP '%s' AND TIMESTAMP '%s';",
                         start.format(toDate), end.format(toDate))
         );
@@ -33,7 +33,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getReleasedBefore(LocalDateTime date) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RELEASE_YEAR < TIMESTAMP '%s';", date.format(toDate))
         );
 
@@ -41,7 +41,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getReleasedAfter(LocalDateTime date) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RELEASE_YEAR > TIMESTAMP '%s';", date.format(toDate))
         );
 
@@ -49,7 +49,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getAvailableInLanguage(String language) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT F.* FROM (FILM F JOIN LANGUAGE L ON F.LANGUAGE_ID = L.LANGUAGE_ID" +
                     ") WHERE lower(NAME) = '%s';", language.toLowerCase())
         );
@@ -58,7 +58,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getWithRentalRateBetween(BigDecimal min, BigDecimal max) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RENTAL_RATE BETWEEN %s AND %s;",
                         min.toPlainString(), max.toPlainString())
         );
@@ -67,7 +67,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getWithLowerRentalRateThan(BigDecimal rate) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RENTAL_RATE < %s;", rate.toPlainString())
         );
 
@@ -75,7 +75,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getWithGreaterRentalRateThan(BigDecimal rate) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RENTAL_RATE > %s;", rate.toPlainString())
         );
 
@@ -83,7 +83,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getWithRentalDurationBetween(int min, int max) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RENTAL_DURATION BETWEEN %d AND %d;", min, max)
         );
 
@@ -91,7 +91,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getWithShorterRentalDurationThan(int duration) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RENTAL_DURATION < %d;", duration)
         );
 
@@ -99,7 +99,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getWithGreaterRentalDurationThan(int duration) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.RENTAL_DURATION > %d;", duration)
         );
 
@@ -107,7 +107,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getWithLengthBetween(int min, int max) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.LENGTH BETWEEN %d AND %d;", min, max)
         );
 
@@ -115,7 +115,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getShorterThan(int minutes) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.LENGTH < %d;", minutes)
         );
 
@@ -123,7 +123,7 @@ public class FilmDao extends Dao<Film> {
     }
 
     public List<Film> getLongerThan(int minutes) throws DaoException {
-        List<Map<String, Object>> result = manager.getData(
+        List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM FILM F WHERE F.LENGTH > %d;", minutes)
         );
 

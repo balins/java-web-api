@@ -1,4 +1,4 @@
-package com.balinski.api_project.util;
+package com.balinski.api_project.servlet.util;
 
 import com.balinski.api_project.database.model.DatabaseModel;
 
@@ -6,12 +6,7 @@ import java.util.List;
 
 public class JsonResponseBuilder {
     public static String mergeFromList(List<? extends DatabaseModel> list) {
-        if(list == null) {
-            return "{\"errors\":[{\"title\":\"Internal server error\"," +
-                    "\"detail\":\"Could not obtain an instance of DAO for given model\"}],\"data\":[]}";
-        }
-
-        StringBuilder sb = new StringBuilder("{\"errors\":\"false\",\"data\":[");
+        StringBuilder sb = new StringBuilder("{\"errors\":[],\"data\":[");
 
         if(list.size() > 0) {
             for (var model : list)
@@ -23,5 +18,10 @@ public class JsonResponseBuilder {
         sb.append("]}");
 
         return sb.toString();
+    }
+
+    public static String getErrorJson(Throwable cause) {
+        return String.format("{\"errors\":[{\"title\":\"Internal server error\"," +
+                "\"detail\":\"%s\"}],\"data\":[]}", cause.getMessage());
     }
 }

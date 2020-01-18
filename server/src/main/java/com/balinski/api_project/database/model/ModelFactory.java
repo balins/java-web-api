@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.Map;
 
 public class ModelFactory<T extends DatabaseModel> {
-    public T getModel(DaoType type, Map<String, Object> map){
+    public T getModel(DaoType type, Map<String, Object> map) throws ClassNotFoundException {
         switch(type) {
             case ACTOR:
                 return actorFromMap(map);
@@ -19,7 +19,7 @@ public class ModelFactory<T extends DatabaseModel> {
             case USER:
                 return userFromMap(map);
             default:
-                return null;
+                throw new ClassNotFoundException("Could not find DAO for class " + type.toString());
         }
     }
 

@@ -1,6 +1,5 @@
 package com.balinski.api_project.database.dao;
 
-import com.balinski.api_project.database.DaoManager;
 import com.balinski.api_project.database.model.*;
 
 import java.util.*;
@@ -16,49 +15,49 @@ abstract class Dao<T extends DatabaseModel> {
         this.transaction = transaction;
     }
 
-    public int getCount() {
-        List<Map<String, Object>> result = manager.queryGetData(
-                String.format("SELECT COUNT(*) AS COUNT FROM %s;", type.toString())
+    public int getCount() throws DaoException {
+        List<Map<String, Object>> result = manager.getData(
+                    String.format("SELECT COUNT(*) AS COUNT FROM %s;", type.toString())
         );
 
         return ((Long)result.get(0).get("COUNT")).intValue();
     }
 
-    public T getById(int id) {
-        List<Map<String, Object>> result = manager.queryGetData(
-                String.format("SELECT * FROM %s T WHERE T.%s_ID = %d;", type.toString(), type.toString(), id)
-        );
+    public T getById(int id) throws DaoException {
+        List<Map<String, Object>> result = manager.getData(
+                    String.format("SELECT * FROM %s T WHERE T.%s_ID = %d;", type.toString(), type.toString(), id)
+            );
 
         return result.size() > 0 ? toListOfObjects(result).get(0) : null;
     }
 
-    public List<T> getAll() {
-        List<Map<String, Object>> result = manager.queryGetData(
-                String.format("SELECT * FROM %s;", type.toString())
+    public List<T> getAll() throws DaoException {
+        List<Map<String, Object>> result = manager.getData(
+                    String.format("SELECT * FROM %sa;", type.toString())
         );
 
         return toListOfObjects(result);
     }
 
-    public List<T> getIdBetween(int start, int stop) {
-        List<Map<String, Object>> result = manager.queryGetData(
-                String.format("SELECT * FROM %s T WHERE T.%s_ID BETWEEN %d AND %d;",
-                        type.toString(), type.toString(), start, stop)
+    public List<T> getIdBetween(int start, int stop) throws DaoException {
+        List<Map<String, Object>> result = manager.getData(
+                    String.format("SELECT * FROM %s T WHERE T.%s_ID BETWEEN %d AND %d;",
+                            type.toString(), type.toString(), start, stop)
         );
 
         return toListOfObjects(result);
     }
 
-    public int add(T obj) {
+    public int add(T obj) throws DaoException {
         if(obj == null)
             return 0;
 
         String sql = String.format("INSERT INTO %s VALUES (%s);", type.toString(), obj.asCsv());
 
-        return manager.queryModify(sql, transaction);
+        return manager.modifyData(sql, transaction);
     }
 
-    public int addAll(List<T> list) {
+    public int addAll(List<T> list) throws DaoException {
         if(list == null || list.size() == 0)
             return 0;
 
@@ -72,10 +71,10 @@ abstract class Dao<T extends DatabaseModel> {
 
         sql.replace(sql.lastIndexOf(", "), sql.length(), ";");
 
-        return manager.queryModify(sql.toString(), transaction);
+        return manager.modifyData(sql.toString(), transaction);
     }
 
-    protected List<T> toListOfObjects(List<Map<String, Object>> listOfMaps) {
+    protected List<T> toListOfObjects(List<Map<String, Object>> listOfMaps) throws DaoException {
         if(listOfMaps == null)
             return null;
 
@@ -83,8 +82,13 @@ abstract class Dao<T extends DatabaseModel> {
 
         ModelFactory<T> factory = new ModelFactory<>();
 
-        for(var map : listOfMaps)
-            listOfObjects.add(factory.getModel(type, map));
+        for(var map : listOfMaps) {
+            try {
+                listOfObjects.add(factory.getModel(type, map));
+            } catch (ClassNotFoundException e) {
+                throw new DaoException("Could not find DAO for given class " + e.getMessage(), e);
+            }
+        }
 
         return listOfObjects;
     }

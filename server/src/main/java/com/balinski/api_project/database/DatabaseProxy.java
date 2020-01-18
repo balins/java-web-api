@@ -1,50 +1,115 @@
 package com.balinski.api_project.database;
 
-import com.balinski.api_project.util.SqlExceptionPrinter;
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Stream;
 
 public class DatabaseProxy {
-    private BasicDataSource dataSource;
-    private Connection connection;
-    private String url;
-    private String username;
-    private String password;
+    protected BasicDataSource dataSource;
+    protected Connection connection;
+    protected String driver;
+    protected String url;
+    protected String username;
+    protected String password;
 
-    public DatabaseProxy(Properties props) {
-        try {
-            loadDatabaseProperties(props);
-            initDataSource();
-        } catch (Exception e) {
-            System.err.println("Cannot initialize database data source: " + e.getMessage());
-        }
+    public DatabaseProxy() throws DatabaseException {
+        loadDatabaseProperties("server/src/main/resources/database.properties");
+        loadDriver();
+        testConnection();
+        initDataSource();
     }
 
-    public Connection getConnection() {
+    public List<Map<String, Object>> querySelect(String sql) throws DatabaseException {
+        List<Map<String, Object>> data;
+
+        try(Connection connection = getConnection()) {
+            try(Statement statement = connection.createStatement()) {
+                try(ResultSet rs = statement.executeQuery(sql)) {
+                    ResultSetMetaData md = rs.getMetaData();
+                    int columns = md.getColumnCount();
+                    data = new LinkedList<>();
+
+                    while(rs.next()) {
+                        Map<String, Object> row = new HashMap<>(columns);
+
+                        for(int i = 1; i <= columns; i++)
+                            row.put(md.getColumnName(i), rs.getObject(i));
+
+                        data.add(row);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("An error occurred when trying to query the database.", e);
+        } finally {
+            closeConnection();
+        }
+
+        return data;
+    }
+
+    public int queryUpdate(String sql, boolean transaction) throws DatabaseException {
+        int rowsAffected = 0;
+
+        try(Connection connection = getConnection()) {
+            if(transaction)
+                connection.setAutoCommit(false);
+
+            try(Statement statement = connection.createStatement()) {
+                rowsAffected = statement.executeUpdate(sql);
+            }
+
+            if(transaction) {
+                connection.setAutoCommit(true);
+                connection.commit();
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("An error occurred when trying to update the database.", e);
+        } finally {
+            closeConnection();
+        }
+
+        return rowsAffected;
+    }
+
+    protected Connection getConnection() throws DatabaseException {
         try {
             this.connection = dataSource.getConnection();
         } catch (SQLException e) {
-            SqlExceptionPrinter.print("Could not obtain an instance of connection from given data source.", e);
+            throw new DatabaseException("Could not obtain an instance of connection from given data source.", e);
         }
 
-        return connection;
+        return this.connection;
     }
 
-    public void closeConnection() {
-        if(connection == null)
+    protected void closeConnection() throws DatabaseException {
+        if(this.connection == null)
             return;
 
         try {
             this.connection.close();
         } catch (SQLException e) {
-            SqlExceptionPrinter.print("Cannot close the connection.", e);
+            throw new DatabaseException("Cannot close the connection.", e);
         }
     }
 
-    private void initDataSource() {
+    private void testConnection() throws DatabaseException {
+        if(Stream.of(url, driver, username, password).anyMatch(Objects::isNull)) {
+            throw new DatabaseException("One of the database properties (url, driver, username, password) is missing. " +
+                    "Check the file containing database properties.");
+        }
+
+        try(Connection ignored = DriverManager.getConnection(url, username, password)) {
+            System.out.println("The database connection was configured successfully.");
+        } catch (SQLException e) {
+            throw new DatabaseException("Wrong credentials or internal database error.", e);
+        }
+    }
+
+    protected void initDataSource() {
         dataSource = new BasicDataSource();
         dataSource.setUrl(url);
         dataSource.setUsername(username);
@@ -54,20 +119,26 @@ public class DatabaseProxy {
         dataSource.setMaxOpenPreparedStatements(100);
     }
 
-    private void loadDatabaseProperties(Properties props) throws NullPointerException, ClassNotFoundException {
-        url = props.getProperty("url");
-        String driver = props.getProperty("driver");
-        username = props.getProperty("username");
-        password = props.getProperty("password");
-
-        if(Stream.of(url, driver, username, password).anyMatch(Objects::isNull)) {
-            throw new NullPointerException("One or more of properties (url, driver, username, password) is missing");
+    protected void loadDatabaseProperties(String path) throws DatabaseException {
+        Properties props;
+        try {
+            props = FilePropertiesLoader.load(path);
+        } catch (IOException e) {
+            throw new DatabaseException("Could not find database properties file under given path: "
+                    + path, e);
         }
 
+        url = props.getProperty("url");
+        driver = props.getProperty("driver");
+        username = props.getProperty("username");
+        password = props.getProperty("password");
+    }
+
+    private void loadDriver() throws DatabaseException {
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
-            throw new ClassNotFoundException("Driver class " + driver + " not found.", e);
+            throw new DatabaseException("Driver class " + driver + " not found.", e);
         }
     }
 }

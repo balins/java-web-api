@@ -1,4 +1,4 @@
-package com.balinski.api_project.util;
+package com.balinski.api_project.database;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,8 +14,6 @@ public class FilePropertiesLoader {
         try (InputStream input = new FileInputStream(absolutePath)) {
             props = new Properties();
             props.load(input);
-        } catch (IOException e) {
-            throw new IOException("Could not find or load database config file.", e);
         }
 
         return props;

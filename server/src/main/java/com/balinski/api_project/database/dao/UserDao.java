@@ -1,6 +1,5 @@
 package com.balinski.api_project.database.dao;
 
-import com.balinski.api_project.database.DaoManager;
 import com.balinski.api_project.database.model.User;
 
 import java.util.List;
@@ -11,8 +10,8 @@ public class UserDao extends Dao<User> {
         super(manager, DaoType.USER, transaction);
     }
 
-    public List<User> getByName(String name) {
-        List<Map<String, Object>> result = manager.queryGetData(
+    public List<User> getByName(String name) throws DaoException {
+        List<Map<String, Object>> result = manager.getData(
                 String.format("SELECT * FROM USER U WHERE lower(U.NAME) = '%s';", name.toLowerCase())
         );
 

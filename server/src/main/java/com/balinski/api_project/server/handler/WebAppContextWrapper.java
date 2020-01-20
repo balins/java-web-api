@@ -24,10 +24,10 @@ public class WebAppContextWrapper {
     }
 
     private void registerServlets() {
-        context.addServlet(ActorServlet.class, "/actors");
-        context.addServlet(FilmServlet.class, "/films");
-        context.addServlet(LanguageServlet.class, "/languages");
-        context.addServlet(UserServlet.class, "/users");
+        context.addServlet(ActorServlet.class, "/actors/*");
+        context.addServlet(FilmServlet.class, "/films/*");
+        context.addServlet(LanguageServlet.class, "/languages/*");
+        context.addServlet(UserServlet.class, "/users/*");
     }
 
 }

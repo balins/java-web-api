@@ -32,7 +32,6 @@ public class Main {
                 System.out.println(film.getTitle());
         } catch (DaoException e) {
             e.printStackTrace();
-            System.exit(-1);
         }
     }
 }

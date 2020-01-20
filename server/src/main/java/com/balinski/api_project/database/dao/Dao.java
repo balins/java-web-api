@@ -21,19 +21,19 @@ abstract class Dao<T extends DatabaseModel> {
         return ((Long)result.get(0).get("COUNT")).intValue();
     }
 
-    public T getById(int id) throws DaoException {
+    public List<T> getById(int id) throws DaoException {
         List<Map<String, Object>> result = DaoManager.getData(
                     String.format("SELECT * FROM %s T WHERE T.%s_ID = %d;", type.toString(), type.toString(), id)
             );
 
-        return result.size() > 0 ? toListOfObjects(result).get(0) : null;
+        return toListOfObjects(result);
     }
 
     public List<T> getAll() throws DaoException {
         List<Map<String, Object>> result = DaoManager.getData(
                     String.format("SELECT * FROM %s;", type.toString())
         );
-
+        
         return toListOfObjects(result);
     }
 

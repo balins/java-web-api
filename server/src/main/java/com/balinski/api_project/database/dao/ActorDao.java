@@ -5,8 +5,8 @@ import com.balinski.api_project.database.model.Actor;
 import java.util.*;
 
 public class ActorDao extends Dao<Actor> {
-    public ActorDao(boolean transaction) {
-        super(DaoType.ACTOR, transaction);
+    public ActorDao() {
+        super(DaoType.ACTOR);
     }
 
     public List<Actor> getByFirstName(String firstName) throws DaoException {

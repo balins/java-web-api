@@ -22,7 +22,7 @@ public class UserServlet extends HttpServlet {
             String response = JsonResponseBuilder.mergeFromList(users);
             writer.print(response);
         } catch (DaoException e) {
-            System.err.println("An error occured in UserServlet: " + e.getMessage());
+            System.err.println("An error occurred in UserServlet: " + e.getMessage());
             writer.print(JsonResponseBuilder.getErrorJson(e));
         }
     }

@@ -69,6 +69,7 @@ public class DatabaseProxy {
                 connection.commit();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DatabaseException("An error occurred when trying to update the database.", e);
         } finally {
             closeConnection();

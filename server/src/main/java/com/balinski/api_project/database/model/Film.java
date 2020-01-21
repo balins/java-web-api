@@ -108,8 +108,8 @@ public class Film extends DatabaseModel {
 
     @Override
     public String asCsv() {
-        return String.format("'%s', '%s', TIMESTAMP '%s', %d, %d, %s, %d, TIMESTAMP '%s'",
-                title, description, releaseYear.format(toDate),
+        return String.format("%d, '%s', '%s', TIMESTAMP '%s', %d, %d, %s, %d, TIMESTAMP '%s'",
+                id, title, description, releaseYear.format(toDate),
                 languageId, rentalDuration, rentalRate.toPlainString(), length,
                 lastUpdate.format(toDateTime));
     }

@@ -63,12 +63,12 @@ public class User extends DatabaseModel {
         return String.format("{\"type\":\"%s\",\"id\":\"%d\",\"attributes\":" +
                         "{\"name\":\"%s\",\"token\":\"%s\",\"used\":\"%d\",\"limit\":\"%d\"," +
                         "\"dateRegistered\":\"%s\",\"lastUpdate\":\"%s\"}}",
-                "users", id, name, token, used, limit, dateRegistered.format(toDate), lastUpdate.format(toDateTime));
+                "users", id, name, token, used, limit, dateRegistered.format(toDateTime), lastUpdate.format(toDateTime));
     }
 
     @Override
     public String asCsv() {
-        return String.format("'%s', '%s', %d, %d, TIMESTAMP '%s', TIMESTAMP '%s'",
-                name, token, used, limit, dateRegistered.format(toDate), lastUpdate.format(toDateTime));
+        return String.format("%d, '%s', '%s', %d, %d, TIMESTAMP '%s', TIMESTAMP '%s'",
+                id, name, token, used, limit, dateRegistered.format(toDateTime), lastUpdate.format(toDateTime));
     }
 }

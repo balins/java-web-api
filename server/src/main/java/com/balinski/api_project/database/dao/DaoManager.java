@@ -10,35 +10,19 @@ public class DaoManager {
     private DaoManager(){}
 
     public static ActorDao getActorDao() {
-        return new ActorDao(false);
+        return new ActorDao();
     }
 
     public static FilmDao getFilmDao() {
-        return new FilmDao(false);
+        return new FilmDao();
     }
 
     public static LanguageDao getLanguageDao() {
-        return new LanguageDao(false);
+        return new LanguageDao();
     }
 
     public static UserDao getUserDao() {
-        return new UserDao(false);
-    }
-
-    public static ActorDao getActorDao(boolean transaction) {
-        return new ActorDao( transaction);
-    }
-
-    public static FilmDao getFilmDao(boolean transaction) {
-        return new FilmDao(transaction);
-    }
-
-    public static LanguageDao getLanguageDao (boolean transaction) {
-        return new LanguageDao( transaction);
-    }
-
-    public static UserDao getUserDao (boolean transaction) {
-        return new UserDao(transaction);
+        return new UserDao();
     }
 
     static List<Map<String, Object>> getData(String sql) throws DaoException {

@@ -21,7 +21,7 @@ public class JsonResponseBuilder {
     }
 
     public static String getErrorJson(Throwable cause) {
-        return String.format("{\"errors\":[{\"title\":\"Internal server error\"," +
+        return String.format("{\"errors\":[{\"title\":\"Error when trying to fetch data\"," +
                 "\"detail\":\"%s\"}],\"data\":[]}", cause.getMessage());
     }
 }

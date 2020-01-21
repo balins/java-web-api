@@ -9,7 +9,7 @@ import com.balinski.api_project.server.JettyServer;
 import java.util.List;
 
 public class Main {
-
+    //"name":"jakub","token":"7f078d288631a4de5fc1ce01fa4e0addeebed19ad5c6d6f543fcc160c5c5cdfc"
     public static void main(String[] args) {
         //testDatabase();
         runApplication();

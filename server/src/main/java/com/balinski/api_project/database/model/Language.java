@@ -41,7 +41,7 @@ public class Language extends DatabaseModel {
 
     @Override
     public String asCsv() {
-        return String.format("'%s', TIMESTAMP '%s'",
-                name, lastUpdate.format(toDateTime));
+        return String.format("%d, '%s', TIMESTAMP '%s'",
+                id, name, lastUpdate.format(toDateTime));
     }
 }

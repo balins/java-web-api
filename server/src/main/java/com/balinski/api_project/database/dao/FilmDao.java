@@ -11,8 +11,8 @@ import java.util.Map;
 public class FilmDao extends Dao<Film> {
     static final DateTimeFormatter toDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public FilmDao(boolean transaction) {
-        super(DaoType.FILM, transaction);
+    public FilmDao() {
+        super(DaoType.FILM);
     }
 
     public List<Film> getByTitle(String title) throws DaoException {

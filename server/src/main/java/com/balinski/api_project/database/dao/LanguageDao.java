@@ -5,8 +5,8 @@ import com.balinski.api_project.database.model.Language;
 import java.util.*;
 
 public class LanguageDao extends Dao<Language> {
-    public LanguageDao(boolean transaction) {
-        super(DaoType.LANGUAGE, transaction);
+    public LanguageDao() {
+        super(DaoType.LANGUAGE);
     }
 
     public List<Language> getByName(String name) throws DaoException {

@@ -5,12 +5,10 @@ import com.balinski.api_project.database.model.*;
 import java.util.*;
 
 abstract class Dao<T extends DatabaseModel> {
-    protected boolean transaction;
     protected DaoType type;
 
-    protected Dao(DaoType type, boolean transaction) {
+    protected Dao(DaoType type) {
         this.type = type;
-        this.transaction = transaction;
     }
 
     public int getCount() throws DaoException {
@@ -52,10 +50,19 @@ abstract class Dao<T extends DatabaseModel> {
 
         String sql = String.format("INSERT INTO %s VALUES (%s);", type.toString(), obj.asCsv());
 
-        return DaoManager.modifyData(sql, transaction);
+        return DaoManager.modifyData(sql, false);
     }
 
-    public int addAll(List<T> list) throws DaoException {
+    public int update(T obj) throws DaoException {
+        if(obj == null)
+            return 0;
+
+        String sql = String.format("INSERT INTO %s VALUES (%s);", type.toString(), obj.asCsv());
+
+        return DaoManager.modifyData(sql, false);
+    }
+
+    public int addAll(List<T> list, boolean transaction) throws DaoException {
         if(list == null || list.size() == 0)
             return 0;
 

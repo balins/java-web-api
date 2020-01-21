@@ -3,7 +3,9 @@ package com.balinski.api_project.servlet;
 import com.balinski.api_project.database.dao.DaoManager;
 import com.balinski.api_project.database.dao.DaoException;
 import com.balinski.api_project.database.model.Actor;
+import com.balinski.api_project.database.model.User;
 import com.balinski.api_project.servlet.util.JsonResponseBuilder;
+import com.balinski.api_project.servlet.util.UserAuthenticator;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,17 +24,20 @@ public class ActorServlet extends HttpServlet {
 
         var enumeration = req.getParameterNames();
 
-        var supportedParameters = Set.of("id", "page", "perPage", "firstName", "lastName", "order");
+        var supportedParameters = Set.of("id", "page", "perPage", "firstName", "lastName", "order", "user", "token");
         var param = Collections.list(enumeration)
                 .stream()
                 .distinct()
                 .filter(supportedParameters::contains)
                 .collect(Collectors.toMap(x -> x, req::getParameter));
 
-        List<Actor> actors;
-        var dao = DaoManager.getActorDao();
-
         try {
+            User user = UserAuthenticator.authenticateAndGet(param.get("user"), param.get("token"));
+            UserAuthenticator.incrementUses(user);
+
+            List<Actor> actors;
+            var dao = DaoManager.getActorDao();
+
             if(param.get("id") != null)
                 actors = dao.getById(Integer.parseInt(param.get("id")));
             else if(param.get("firstName") != null)
@@ -57,9 +62,7 @@ public class ActorServlet extends HttpServlet {
             String response = JsonResponseBuilder.mergeFromList(actors);
             writer.print(response);
         } catch (DaoException e) {
-            System.err.println("An error occurred in ActorServlet: " + e.getMessage());
             writer.print(JsonResponseBuilder.getErrorJson(e));
-            e.printStackTrace();
         }
     }
 }

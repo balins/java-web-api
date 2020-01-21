@@ -49,7 +49,7 @@ public class AddUserServlet extends HttpServlet {
             if(limit < 0)
                 throw new DaoException("Limit can not be a negative number.");
 
-            int newId = DaoManager.getUserDao().getCount()+1;
+            int newId = DaoManager.getUserDao().getMaxId()+1;
             User user = new User(newId, name, sha256(name), 0, limit, LocalDateTime.now(), LocalDateTime.now());
             DaoManager.getUserDao().add(user);
 

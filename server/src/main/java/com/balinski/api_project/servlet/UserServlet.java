@@ -18,6 +18,8 @@ public class UserServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
 
         try {
+            int newId = DaoManager.getUserDao().getMaxId()+1;
+            System.out.println(newId);
             List<User> users = DaoManager.getUserDao().getAll();
             String response = JsonResponseBuilder.mergeFromList(users);
             writer.print(response);

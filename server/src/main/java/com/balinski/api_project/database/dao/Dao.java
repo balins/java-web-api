@@ -19,6 +19,14 @@ abstract class Dao<T extends DatabaseModel> {
         return ((Long)result.get(0).get("COUNT")).intValue();
     }
 
+    public int getMaxId() throws DaoException {
+        List<Map<String, Object>> result = DaoManager.getData(
+                String.format("SELECT MAX(%s_ID) AS ID FROM %s;", type.toString(), type.toString())
+        );
+
+        return result.size() > 0 ? (int)result.get(0).get("ID") : 0;
+    }
+
     public List<T> getById(int id) throws DaoException {
         List<Map<String, Object>> result = DaoManager.getData(
                     String.format("SELECT * FROM %s T WHERE T.%s_ID = %d;", type.toString(), type.toString(), id)

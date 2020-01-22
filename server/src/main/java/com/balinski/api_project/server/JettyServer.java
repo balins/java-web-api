@@ -26,7 +26,7 @@ public class JettyServer {
         context.addServlet(FilmServlet.class, "/films/*");
         context.addServlet(LanguageServlet.class, "/languages/*");
         context.addServlet(UserServlet.class, "/users/*");
-        context.addServlet(AddUserServlet.class, "/adduser/*");
+        context.addServlet(AdminServlet.class, "/admin/*");
     }
 
 }

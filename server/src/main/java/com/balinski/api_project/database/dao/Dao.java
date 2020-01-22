@@ -61,15 +61,6 @@ abstract class Dao<T extends DatabaseModel> {
         return DaoManager.modifyData(sql, false);
     }
 
-    public int update(T obj) throws DaoException {
-        if(obj == null)
-            return 0;
-
-        String sql = String.format("INSERT INTO %s VALUES (%s);", type.toString(), obj.asCsv());
-
-        return DaoManager.modifyData(sql, false);
-    }
-
     public int addAll(List<T> list, boolean transaction) throws DaoException {
         if(list == null || list.size() == 0)
             return 0;
@@ -85,6 +76,12 @@ abstract class Dao<T extends DatabaseModel> {
         sql.replace(sql.lastIndexOf(", "), sql.length(), ";");
 
         return DaoManager.modifyData(sql.toString(), transaction);
+    }
+
+    public boolean delete(int id) throws DaoException {
+        return DaoManager.modifyData(
+                String.format("DELETE FROM %s WHERE %s_ID=%d;", type.toString(), type.toString(), id),
+                false) > 0;
     }
 
     protected List<T> toListOfObjects(List<Map<String, Object>> listOfMaps) throws DaoException {

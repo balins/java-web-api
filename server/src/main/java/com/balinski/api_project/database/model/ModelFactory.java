@@ -41,7 +41,7 @@ public class ModelFactory<T extends DatabaseModel> {
     }
 
     private T userFromMap(Map<String, Object> map) {
-        return (T) new User((int)map.get("USER_ID"), (String)map.get("NAME"),
+        return (T) new User((int)map.get("USER_ID"), (String)map.get("ROLE"), (String)map.get("NAME"),
                 (String)map.get("TOKEN"), (int)map.get("REQUESTS_SENT"), (int)map.get("USE_LIMIT"),
                 ((Timestamp)map.get("DATE_REGISTERED")).toLocalDateTime(),
                 ((Timestamp)map.get("LAST_UPDATE")).toLocalDateTime());

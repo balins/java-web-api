@@ -16,7 +16,7 @@ public class DatabaseProxy {
     protected static String password;
 
     static {
-        loadDatabaseProperties("server/src/main/resources/database.properties");
+        loadDatabaseProperties();
         loadDriver();
         testConnection();
         initDataSource();
@@ -122,13 +122,13 @@ public class DatabaseProxy {
         dataSource.setMaxOpenPreparedStatements(100);
     }
 
-    protected static void loadDatabaseProperties(String path) throws DatabaseException {
+    protected static void loadDatabaseProperties() throws DatabaseException {
         Properties props;
         try {
-            props = FilePropertiesLoader.load(path);
+            props = FilePropertiesLoader.load("server/src/main/resources/database.properties");
         } catch (IOException e) {
             throw new DatabaseException("Could not find database properties file under given path: "
-                    + path, e);
+                    + "server/src/main/resources/database.properties", e);
         }
 
         url = props.getProperty("url");

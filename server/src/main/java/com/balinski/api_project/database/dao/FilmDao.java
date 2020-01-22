@@ -116,7 +116,7 @@ public class FilmDao extends Dao<Film> {
 
     public List<Film> getShorterThan(int minutes) throws DaoException {
         List<Map<String, Object>> result = DaoManager.getData(
-                String.format("SELECT * FROM FILM F WHERE F.LENGTH < %d;", minutes)
+                String.format("SELECT * FROM FILM F WHERE F.LENGTH < %d;", minutes+1)
         );
 
         return toListOfObjects(result);
@@ -124,7 +124,7 @@ public class FilmDao extends Dao<Film> {
 
     public List<Film> getLongerThan(int minutes) throws DaoException {
         List<Map<String, Object>> result = DaoManager.getData(
-                String.format("SELECT * FROM FILM F WHERE F.LENGTH > %d;", minutes)
+                String.format("SELECT * FROM FILM F WHERE F.LENGTH > %d;", minutes-1)
         );
 
         return toListOfObjects(result);

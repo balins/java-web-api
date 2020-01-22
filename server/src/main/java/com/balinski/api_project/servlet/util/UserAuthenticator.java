@@ -31,6 +31,7 @@ public class UserAuthenticator {
 
     public static void incrementUses(User user) throws DaoException {
         boolean success = DaoManager.getUserDao().incrementUses(user.getId());
+
         if(!success)
             throw new DaoException("There was an error with authentication. " +
                     "Please try again later or contact us if problem still occurs.");

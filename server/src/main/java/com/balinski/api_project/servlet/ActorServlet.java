@@ -44,19 +44,22 @@ public class ActorServlet extends HttpServlet {
                 actors = dao.getByFirstName(param.get("firstName"));
             else if(param.get("lastName") != null)
                 actors = dao.getByLastName(param.get("lastName"));
-            else if(param.get("perPage") != null && param.get("page") != null) {
-                int perPage = Integer.parseInt(param.get("perPage"));
-                int page = Integer.parseInt(param.get("page"));
-                actors = dao.getIdBetween(perPage*page+1, perPage*(page+1));
-            } else {
+            else
                 actors = dao.getAll();
-            }
 
             if(param.get("order") != null) {
                 if(param.get("order").equalsIgnoreCase("desc"))
                     actors.sort(Comparator.comparing(Actor::getLastName).thenComparing(Actor::getFirstName).reversed());
                 else
                     actors.sort(Comparator.comparing(Actor::getLastName).thenComparing(Actor::getFirstName));
+            }
+
+            if(param.get("perPage") != null && param.get("page") != null) {
+                int perPage = Integer.parseInt(param.get("perPage"));
+                int page = Integer.parseInt(param.get("page"));
+                int firstRecord = Math.min(perPage*page, actors.size());
+                int lastRecord = Math.min(perPage * (page + 1), actors.size());
+                actors = actors.subList(firstRecord, lastRecord);
             }
 
             String response = JsonResponseBuilder.mergeFromList(actors);

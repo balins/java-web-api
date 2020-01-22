@@ -21,6 +21,14 @@ public class UserDao extends Dao<User> {
         return toListOfObjects(result);
     }
 
+    public List<User> getByRole(String role) throws DaoException {
+        List<Map<String, Object>> result = DaoManager.getData(
+                String.format("SELECT * FROM USER U WHERE lower(U.ROLE) = '%s';", role.toLowerCase())
+        );
+
+        return toListOfObjects(result);
+    }
+
     public List<User> getByToken(String token) throws DaoException {
         List<Map<String, Object>> result = DaoManager.getData(
                 String.format("SELECT * FROM USER U WHERE lower(U.token) = '%s';", token.toLowerCase())
@@ -29,12 +37,19 @@ public class UserDao extends Dao<User> {
         return toListOfObjects(result);
     }
 
+    public boolean renewAccess(int id, int newLimit) throws DaoException {
+        return DaoManager.modifyData(
+                String.format("UPDATE USER SET REQUESTS_SENT=0, USE_LIMIT=%d, LAST_UPDATE='%s' WHERE USER_ID=%d;",
+                        newLimit, LocalDateTime.now().format(toDateTime), id),
+                false) > 0;
+    }
+
     public boolean incrementUses(int id) throws DaoException {
         return DaoManager.modifyData(
                 String.format("UPDATE USER SET REQUESTS_SENT=" +
-                        "(SELECT U.REQUESTS_SENT FROM USERS U WHERE U.ID=%d)+1, " +
+                        "((SELECT U.REQUESTS_SENT FROM USER U WHERE U.USER_ID=%d)+1), " +
                         "LAST_UPDATE='%s' " +
-                        "WHERE U.ID=%d;", id, LocalDateTime.now().format(toDateTime), id),
-                true) > 0;
+                        "WHERE USER_ID=%d;", id, LocalDateTime.now().format(toDateTime), id),
+                false) > 0;
     }
 }

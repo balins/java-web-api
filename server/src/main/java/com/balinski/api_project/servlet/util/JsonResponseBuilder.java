@@ -1,16 +1,12 @@
-package com.balinski.api_project.util;
+package com.balinski.api_project.servlet.util;
 
 import com.balinski.api_project.database.model.DatabaseModel;
 
 import java.util.List;
 
-public class JsonHelper {
+public class JsonResponseBuilder {
     public static String mergeFromList(List<? extends DatabaseModel> list) {
-        if(list == null) {
-            return "{\"error\":true,\"data\":[]}";
-        }
-
-        StringBuilder sb = new StringBuilder("{\"error\":false,\"data\":[");
+        StringBuilder sb = new StringBuilder("{\"errors\":[],\"data\":[");
 
         if(list.size() > 0) {
             for (var model : list)
@@ -22,5 +18,10 @@ public class JsonHelper {
         sb.append("]}");
 
         return sb.toString();
+    }
+
+    public static String getErrorJson(Throwable cause) {
+        return String.format("{\"errors\":[{\"title\":\"Error when trying to fetch data\"," +
+                "\"detail\":\"%s\"}],\"data\":[]}", cause.getMessage());
     }
 }

@@ -4,16 +4,19 @@ import java.time.LocalDateTime;
 
 public class User extends DatabaseModel {
     final int id;
+    final String role;
     final String name;
-    final String token;
+    String token;
     int used;
     final int limit;
     final LocalDateTime dateRegistered;
     LocalDateTime lastUpdate;
 
-    public User(int id, String name, String token, int used, int limit,
+
+    public User(int id, String role, String name, String token, int used, int limit,
                 LocalDateTime dateRegistered, LocalDateTime lastUpdate) {
         this.id = id;
+        this.role = role;
         this.name = name;
         this.token = token;
         this.used = used;
@@ -24,6 +27,10 @@ public class User extends DatabaseModel {
 
     public int getId() {
         return id;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public String getName() {
@@ -50,6 +57,10 @@ public class User extends DatabaseModel {
         return lastUpdate;
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public void setUsed(int used) {
         this.used = used;
     }
@@ -60,14 +71,15 @@ public class User extends DatabaseModel {
 
     @Override
     public String asJson(){
-        return String.format("{\"id\":%d,\"name\":\"%s\",\"token\":\"%s\",\"used\":%d,\"limit\":%d," +
-                        "\"dateRegistered\":%s,\"lastUpdate\":\"%s\"}",
-                id, name, token, used, limit, dateRegistered.format(toDate), lastUpdate.format(toDateTime));
+        return String.format("{\"type\":\"%s\",\"id\":\"%d\",\"attributes\":" +
+                        "{\"role\":\"%s\",\"name\":\"%s\",\"token\":\"%s\",\"used\":\"%d\",\"limit\":\"%d\"," +
+                        "\"dateRegistered\":\"%s\",\"lastUpdate\":\"%s\"}}",
+                "users", id, role, name, token, used, limit, dateRegistered.format(toDateTime), lastUpdate.format(toDateTime));
     }
 
     @Override
     public String asCsv() {
-        return String.format("'%s', '%s', %d, %d, TIMESTAMP '%s', TIMESTAMP '%s'",
-                name, token, used, limit, dateRegistered.format(toDate), lastUpdate.format(toDateTime));
+        return String.format("%d, '%s', '%s', '%s', %d, %d, TIMESTAMP '%s', TIMESTAMP '%s'",
+                id, role, name, token, used, limit, dateRegistered.format(toDateTime), lastUpdate.format(toDateTime));
     }
 }

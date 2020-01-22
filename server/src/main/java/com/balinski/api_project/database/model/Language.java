@@ -35,13 +35,13 @@ public class Language extends DatabaseModel {
 
     @Override
     public String asJson() {
-        return String.format("{\"id\":%d,\"name\":\"%s\",\"lastUpdate\":\"%s\"}",
-                    id, name, lastUpdate.format(toDateTime));
+        return String.format("{\"type\":\"%s\",\"id\":\"%d\",\"attributes\":{\"name\":\"%s\",\"lastUpdate\":\"%s\"}}",
+                    "languages", id, name, lastUpdate.format(toDateTime));
     }
 
     @Override
     public String asCsv() {
-        return String.format("'%s', TIMESTAMP '%s'",
-                name, lastUpdate.format(toDateTime));
+        return String.format("%d, '%s', TIMESTAMP '%s'",
+                id, name, lastUpdate.format(toDateTime));
     }
 }

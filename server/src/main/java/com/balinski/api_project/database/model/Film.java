@@ -98,17 +98,18 @@ public class Film extends DatabaseModel {
 
     @Override
     public String asJson() {
-        return String.format("{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\",\"releaseYear\":\"%s\"," +
-                        "\"languageId\":%d,\"rentalDuration\":%d,\"rentalRate\":%s,\"length\":%d,\"lastUpdate\":\"%s\"}",
-                id, title, description, releaseYear.format(toDate),
-                languageId, getRentalDuration(), rentalRate.toPlainString(),
-                length, lastUpdate.format(toDateTime));
+        return String.format("{\"type\":\"%s\",\"id\":\"%d\",\"attributes\":" +
+                        "{\"title\":\"%s\",\"description\":\"%s\",\"releaseYear\":\"%s\",\"rentalDuration\":\"%d\"," +
+                        "\"rentalRate\":\"%s\",\"length\":\"%d\",\"lastUpdate\":\"%s\"},\"relationships\":" +
+                        "{\"language\":\"data\":{\"type\":\"languages\",\"id\":\"%d\"}}}",
+                "films", id, title, description, releaseYear.format(toDate), rentalDuration,
+                rentalRate.toPlainString(), length, lastUpdate.format(toDateTime), languageId);
     }
 
     @Override
     public String asCsv() {
-        return String.format("'%s', '%s', TIMESTAMP '%s', %d, %d, %s, %d, TIMESTAMP '%s'",
-                title, description, releaseYear.format(toDate),
+        return String.format("%d, '%s', '%s', TIMESTAMP '%s', %d, %d, %s, %d, TIMESTAMP '%s'",
+                id, title, description, releaseYear.format(toDate),
                 languageId, rentalDuration, rentalRate.toPlainString(), length,
                 lastUpdate.format(toDateTime));
     }

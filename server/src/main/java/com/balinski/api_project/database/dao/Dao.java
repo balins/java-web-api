@@ -52,18 +52,9 @@ abstract class Dao<T extends DatabaseModel> {
         return toListOfObjects(result);
     }
 
-    public int add(T obj) throws DaoException {
-        if(obj == null)
-            return 0;
-
-        String sql = String.format("INSERT INTO %s VALUES (%s);", type.toString(), obj.asCsv());
-
-        return DaoManager.modifyData(sql, false);
-    }
-
-    public int addAll(List<T> list, boolean transaction) throws DaoException {
+    public List<T> add(List<T> list, boolean transaction) throws DaoException {
         if(list == null || list.size() == 0)
-            return 0;
+            return Collections.emptyList();
 
         StringBuilder sql = new StringBuilder(String.format("INSERT INTO %s VALUES ", type.toString()));
 
@@ -75,13 +66,17 @@ abstract class Dao<T extends DatabaseModel> {
 
         sql.replace(sql.lastIndexOf(", "), sql.length(), ";");
 
-        return DaoManager.modifyData(sql.toString(), transaction);
+        List<Map<String, Object>> result = DaoManager.modifyData(sql.toString(), transaction);
+
+        return toListOfObjects(result);
     }
 
-    public boolean delete(int id) throws DaoException {
-        return DaoManager.modifyData(
+    public List<T> delete(int id) throws DaoException {
+        List<Map<String, Object>> result = DaoManager.modifyData(
                 String.format("DELETE FROM %s WHERE %s_ID=%d;", type.toString(), type.toString(), id),
-                false) > 0;
+                false);
+
+        return toListOfObjects(result);
     }
 
     protected List<T> toListOfObjects(List<Map<String, Object>> listOfMaps) throws DaoException {

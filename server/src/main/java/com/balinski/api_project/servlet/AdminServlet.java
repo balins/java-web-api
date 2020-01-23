@@ -2,6 +2,7 @@ package com.balinski.api_project.servlet;
 
 import com.balinski.api_project.database.dao.DaoException;
 import com.balinski.api_project.database.dao.DaoManager;
+import com.balinski.api_project.database.dao.UserDao;
 import com.balinski.api_project.database.model.User;
 import com.balinski.api_project.servlet.util.JsonResponseBuilder;
 import com.balinski.api_project.servlet.util.UserAuthenticator;
@@ -15,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -35,16 +37,46 @@ public class AdminServlet extends HttpServlet {
         return hexString.toString();
     }
 
-    private User addUser(String name, int limit) throws DaoException, NoSuchAlgorithmException {
-        if(limit < 0)
-            throw new DaoException("Limit can not be a negative number.");
+    private List<User> addUsers(String[] names, String[] limits) throws DaoException, NoSuchAlgorithmException {
+        if(names.length != limits.length)
+            throw new DaoException("Quantity of names and limits do not match.");
 
-        int newId = DaoManager.getUserDao().getMaxId()+1;
-        User user = new User(newId, "user", name, sha256(name), 0,
-                limit, LocalDateTime.now(), LocalDateTime.now());
-        DaoManager.getUserDao().add(user);
+        UserDao dao = DaoManager.getUserDao();
+        int id = dao.getMaxId()+1;
+        List<User> users = new ArrayList<>(names.length);
 
-        return user;
+        for(int i = 0; i < names.length; i++) {
+            if(Integer.parseInt(limits[i]) < 0)
+                limits[i] = "0";
+
+            users.add(new User(id, "user", names[i], sha256(names[i]), 0,
+                    Integer.parseInt(limits[i]), LocalDateTime.now(), LocalDateTime.now()));
+
+            id++;
+        }
+
+        return DaoManager.getUserDao().add(users, true);
+    }
+
+    private List<User> renewAccess(String[] ids, String[] limits) throws DaoException {
+        List<User> users = new ArrayList<>(ids.length);
+
+        for(int i = 0; i < ids.length; i++) {
+            if(Integer.parseInt(limits[i]) < 0)
+                limits[i] = "0";
+
+            users.addAll(DaoManager.getUserDao().renewAccess(Integer.parseInt(ids[i]), Integer.parseInt(limits[i])));
+        }
+
+        return users;
+    }
+
+    private List<User> deleteUsers(String[] ids) throws DaoException {
+        List<User> users = new ArrayList<>(ids.length);
+        for (String id : ids)
+            users.addAll(DaoManager.getUserDao().delete(Integer.parseInt(id)));
+
+        return users;
     }
 
     @Override
@@ -64,42 +96,46 @@ public class AdminServlet extends HttpServlet {
 
             String action = req.getParameter("action").toLowerCase();
             String response;
-            User user;
-            boolean success;
+            List<User> users;
+            String[] userIds, userNames, userLimits;
 
             switch(action) {
                 case "add":
                     if(req.getParameter("name") == null || req.getParameter("limit") == null)
                         throw new DaoException("You have to provide name and limit to add new user.");
 
-                    user = addUser(req.getParameter("name"), Integer.parseInt(req.getParameter("limit")));
-                    response = JsonResponseBuilder.mergeFromList(List.of(user));
+                    userNames = req.getParameter("name").split(",");
+                    userLimits = req.getParameter("limit").split(",");
+
+                    users = addUsers(userNames, userLimits);
+
+                    response = JsonResponseBuilder.mergeFromList(users);
                     break;
 
                 case "renew":
                     if(req.getParameter("id") == null || req.getParameter("limit") == null)
                         throw new DaoException("You have to provide id and new limit to renew user's access.");
 
-                    success = DaoManager.getUserDao()
-                            .renewAccess(Integer.parseInt(req.getParameter("id")),
-                                    Integer.parseInt(req.getParameter("limit")));
-                    if(!success)
-                        throw new DaoException("Could not update the user. Check if provided parameters are valid.");
+                    userIds = req.getParameter("id").split(",");
+                    userLimits = req.getParameter("limit").split(",");
 
-                    response = "User's access has been successfully renewed.";
+                    if(userIds.length != userLimits.length)
+                        throw new DaoException("Quantity of IDs and limits do not match.");
+
+                    users = renewAccess(userIds, userLimits);
+
+                    response = JsonResponseBuilder.mergeFromList(users);
                     break;
 
                 case "delete":
                     if(req.getParameter("id") == null)
                         throw new DaoException("You have to provide id of user that you want to be deleted.");
 
-                    success = DaoManager.getUserDao()
-                            .delete(Integer.parseInt(req.getParameter("id")));
+                    userIds = req.getParameter("id").split(",");
 
-                    if(!success)
-                        throw new DaoException("Could not delete the user. Check if provided id is valid.");
+                    users = deleteUsers(userIds);
 
-                    response = "The user has been successfully removed.";
+                    response = JsonResponseBuilder.mergeFromList(users);
                     break;
 
                 default:

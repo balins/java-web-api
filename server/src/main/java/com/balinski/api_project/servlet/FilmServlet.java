@@ -12,10 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FilmServlet extends HttpServlet {
@@ -36,15 +33,21 @@ public class FilmServlet extends HttpServlet {
             User user = UserAuthenticator.authenticateAndGet(param.get("user"), param.get("token"));
             UserAuthenticator.incrementUses(user);
 
-            List<Film> films;
+            List<Film> films = new LinkedList<>();
             var dao = DaoManager.getFilmDao();
 
-            if(param.get("id") != null)
-                films = dao.getById(Integer.parseInt(param.get("id")));
-            else if(param.get("title") != null)
-                films = dao.getByTitle(param.get("title"));
-            else if(param.get("language") != null)
-                films = dao.getAvailableInLanguage(param.get("language"));
+            if(param.get("id") != null){
+                for(var id : param.get("id").split(","))
+                    films.addAll(dao.getById(Integer.parseInt(id)));
+            }
+            else if(param.get("title") != null){
+                for(var title : param.get("title").split(","))
+                    films.addAll(dao.getByTitle(title));
+            }
+            else if(param.get("language") != null){
+                for(var language : param.get("language").split(","))
+                    films.addAll(dao.getByTitle(language));
+            }
             else if(param.get("minLength") != null) {
                 films = dao.getLongerThan(Integer.parseInt(param.get("minLength")));
                 films.sort(Comparator.comparing(Film::getLength).thenComparing(Film::getTitle));

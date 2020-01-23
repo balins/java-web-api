@@ -37,19 +37,23 @@ public class UserDao extends Dao<User> {
         return toListOfObjects(result);
     }
 
-    public boolean renewAccess(int id, int newLimit) throws DaoException {
-        return DaoManager.modifyData(
+    public List<User> renewAccess(int id, int newLimit) throws DaoException {
+        List<Map<String, Object>> result = DaoManager.modifyData(
                 String.format("UPDATE USER SET REQUESTS_SENT=0, USE_LIMIT=%d, LAST_UPDATE='%s' WHERE USER_ID=%d;",
                         newLimit, LocalDateTime.now().format(toDateTime), id),
-                false) > 0;
+                false);
+
+        return toListOfObjects(result);
     }
 
-    public boolean incrementUses(int id) throws DaoException {
-        return DaoManager.modifyData(
+    public List<User> incrementUses(int id) throws DaoException {
+        List<Map<String, Object>> result = DaoManager.modifyData(
                 String.format("UPDATE USER SET REQUESTS_SENT=" +
                         "((SELECT U.REQUESTS_SENT FROM USER U WHERE U.USER_ID=%d)+1), " +
                         "LAST_UPDATE='%s' " +
                         "WHERE USER_ID=%d;", id, LocalDateTime.now().format(toDateTime), id),
-                false) > 0;
+                false);
+
+        return toListOfObjects(result);
     }
 }

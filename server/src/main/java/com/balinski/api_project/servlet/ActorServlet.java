@@ -35,15 +35,21 @@ public class ActorServlet extends HttpServlet {
             User user = UserAuthenticator.authenticateAndGet(param.get("user"), param.get("token"));
             UserAuthenticator.incrementUses(user);
 
-            List<Actor> actors;
+            List<Actor> actors = new LinkedList<>();
             var dao = DaoManager.getActorDao();
 
-            if(param.get("id") != null)
-                actors = dao.getById(Integer.parseInt(param.get("id")));
-            else if(param.get("firstName") != null)
-                actors = dao.getByFirstName(param.get("firstName"));
-            else if(param.get("lastName") != null)
-                actors = dao.getByLastName(param.get("lastName"));
+            if(param.get("id") != null) {
+                for(var id : param.get("id").split(","))
+                    actors.addAll(dao.getById(Integer.parseInt(id)));
+            }
+            else if(param.get("firstName") != null) {
+                for(var firstName : param.get("firstName").split(","))
+                    actors.addAll(dao.getByFirstName(firstName));
+            }
+            else if(param.get("lastName") != null) {
+                for(var lastName : param.get("lastName").split(","))
+                    actors.addAll(dao.getByFirstName(lastName));
+            }
             else
                 actors = dao.getAll();
 

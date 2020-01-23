@@ -25,14 +25,13 @@ public class DatabaseProxy {
     private DatabaseProxy(){};
 
     public static List<Map<String, Object>> querySelect(String sql) throws DatabaseException {
-        List<Map<String, Object>> data;
+        List<Map<String, Object>> data = new LinkedList<>();
 
         try(Connection connection = getConnection()) {
             try(Statement statement = connection.createStatement()) {
                 try(ResultSet rs = statement.executeQuery(sql)) {
                     ResultSetMetaData md = rs.getMetaData();
                     int columns = md.getColumnCount();
-                    data = new LinkedList<>();
 
                     while(rs.next()) {
                         Map<String, Object> row = new HashMap<>(columns);
@@ -53,15 +52,27 @@ public class DatabaseProxy {
         return data;
     }
 
-    public static int queryUpdate(String sql, boolean transaction) throws DatabaseException {
-        int rowsAffected = 0;
+    public static List<Map<String, Object>> queryUpdate(String sql, boolean transaction) throws DatabaseException {
+        List<Map<String, Object>> data = new LinkedList<>();
 
         try(Connection connection = getConnection()) {
             if(transaction)
                 connection.setAutoCommit(false);
 
-            try(Statement statement = connection.createStatement()) {
-                rowsAffected = statement.executeUpdate(sql);
+            try(PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
+                ResultSetMetaData md = rs.getMetaData();
+                int columns = md.getColumnCount();
+
+                while(rs.next()) {
+                    Map<String, Object> row = new HashMap<>(columns);
+
+                    for (int i = 1; i <= columns; i++)
+                        row.put(md.getColumnName(i), rs.getObject(i));
+
+                    data.add(row);
+                }
             }
 
             if(transaction) {
@@ -75,7 +86,7 @@ public class DatabaseProxy {
             closeConnection();
         }
 
-        return rowsAffected;
+        return data;
     }
 
     protected static Connection getConnection() throws DatabaseException {

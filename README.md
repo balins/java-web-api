@@ -14,8 +14,8 @@ Tested on **H2Database** v1.4.196.
 
 * Build using Maven `mvn install`
 * Create a new database
-    * you can find **ready-to-go** database and .properties files in folder `/example_db`.
-    Use these to skip the following two steps.
+    * NOTE: you can find **ready-to-go** database and .properties file in folder `/example_db`.
+    Use these to skip the next two steps.
 * Initialize the database with provided script `/sakila-min.sql`
     * by default script provides admin user as _user: admin'_, _password: 'admin'_
 * Create _.properties_ file including all necessary data:
@@ -27,7 +27,7 @@ Tested on **H2Database** v1.4.196.
     username=*login for your database*
     password=*password for your database*
     ```
-    
+
 * Run application with the following parameters:
     * `-port [1024..49151]` - port number that will be used by server
     * `-dbProps path` - **relative** path to _.properties_ file
@@ -60,8 +60,8 @@ Can access all **public** routes of the API in terms of his usage limits.
 Can access **all routes** of the API in terms of his usage limits and has ability to:
 * access all users' data,
 * add new users,
-* delete current users,
-* renew current users' usage limits.
+* delete users,
+* renew users' usage limits.
 
 ## Public routes
 
@@ -155,11 +155,11 @@ by listing many ids
 
             /users?filter=all...
 
-    * admin (filters by role)
+    * admin (returns all admins)
 
             /users?filter=admin...
 
-    * user (filters by role)
+    * user (returns all standard users)
 
             /users?filter=user...
 
@@ -180,7 +180,7 @@ by listing many ids
 
     * delete
 
-            /admin?action=add&id=65536
+            /admin?action=delete&id=65536
 
 
 You can modify multiple records within one request, for example:

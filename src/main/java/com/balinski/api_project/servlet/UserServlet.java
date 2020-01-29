@@ -2,8 +2,10 @@ package com.balinski.api_project.servlet;
 
 import com.balinski.api_project.database.dao.DaoException;
 import com.balinski.api_project.database.dao.DaoManager;
+import com.balinski.api_project.database.dao.UserDao;
 import com.balinski.api_project.database.model.User;
 import com.balinski.api_project.servlet.util.JsonResponseBuilder;
+import com.balinski.api_project.servlet.util.StringToArrayConverter;
 import com.balinski.api_project.servlet.util.UserAuthenticator;
 
 import javax.servlet.http.HttpServlet;
@@ -27,27 +29,35 @@ public class UserServlet extends HttpServlet {
             if(!admin.getRole().equalsIgnoreCase("admin"))
                 throw new DaoException("Only administrators are allowed to get users information.");
 
+
+            UserDao userDao = DaoManager.getUserDao();
+            List<User> users;
+
+            String id = req.getParameter("id");
+            if(id != null)
+                users = userDao.getManyByIds(StringToArrayConverter.toIntArray(id));
+            else
+                users = userDao.getAll();
+
             String filter = req.getParameter("filter");
             if(filter == null)
-                filter = "all";
-
-            filter = filter.toLowerCase();
-            List<User> users;
+                filter = "";
+            else
+                filter = filter.toLowerCase();
 
             switch(filter) {
                 case "admin":
-                    users = DaoManager.getUserDao().getByRole("admin");
-                    break;
                 case "user":
-                    users = DaoManager.getUserDao().getByRole("user");
-                    break;
-                case "noAccess":
-                    users = DaoManager.getUserDao().getAll()
-                            .stream().filter(u -> u.getUsed() == u.getLimit())
+                    String finalFilter = filter;
+                    users = users.stream()
+                            .filter(u -> u.getRole().equalsIgnoreCase(finalFilter))
                             .collect(Collectors.toList());
                     break;
-                default:
-                    users = DaoManager.getUserDao().getAll();
+                case "noaccess":
+                    users = users.stream()
+                            .filter(u -> u.getUsed() == u.getLimit())
+                            .collect(Collectors.toList());
+                    break;
             }
 
             if(req.getParameter("order") != null) {

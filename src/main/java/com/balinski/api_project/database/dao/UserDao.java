@@ -29,14 +29,6 @@ public class UserDao extends Dao<User> {
         return toListOfObjects(result);
     }
 
-    public List<User> getByToken(String token) throws DaoException {
-        List<Map<String, Object>> result = DaoManager.getData(
-                String.format("SELECT * FROM USER U WHERE lower(U.token) = '%s';", token.toLowerCase())
-        );
-
-        return toListOfObjects(result);
-    }
-
     public List<User> renewAccess(int id, int newLimit) throws DaoException {
         List<Map<String, Object>> result = DaoManager.modifyData(
                 String.format("UPDATE USER SET REQUESTS_SENT=0, USE_LIMIT=%d, LAST_UPDATE='%s' WHERE USER_ID=%d;",

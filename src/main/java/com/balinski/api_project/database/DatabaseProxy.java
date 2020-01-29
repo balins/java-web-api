@@ -2,7 +2,6 @@ package com.balinski.api_project.database;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Stream;
@@ -14,15 +13,21 @@ public class DatabaseProxy {
     protected static String url;
     protected static String username;
     protected static String password;
+    private static boolean initialized = false;
 
-    static {
-        loadDatabaseProperties();
+    private DatabaseProxy(){};
+
+    public static void init(Properties props) {
+        if(initialized)
+            return;
+
+        setDatabaseProperties(props);
         loadDriver();
         testConnection();
         initDataSource();
-    }
 
-    private DatabaseProxy(){};
+        initialized = true;
+    }
 
     public static List<Map<String, Object>> querySelect(String sql) throws DatabaseException {
         List<Map<String, Object>> data = new LinkedList<>();
@@ -44,6 +49,7 @@ public class DatabaseProxy {
                 }
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DatabaseException("An error occurred when trying to query the database.", e);
         } finally {
             closeConnection();
@@ -80,7 +86,6 @@ public class DatabaseProxy {
                 connection.commit();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             throw new DatabaseException("An error occurred when trying to update the database.", e);
         } finally {
             closeConnection();
@@ -110,6 +115,13 @@ public class DatabaseProxy {
         }
     }
 
+    private static void setDatabaseProperties(Properties props) throws DatabaseException {
+        url = props.getProperty("url");
+        driver = props.getProperty("driver");
+        username = props.getProperty("username");
+        password = props.getProperty("password");
+    }
+
     private static void testConnection() throws DatabaseException {
         if(Stream.of(url, driver, username, password).anyMatch(Objects::isNull)) {
             throw new DatabaseException("One of the database properties (url, driver, username, password) is missing. " +
@@ -123,7 +135,7 @@ public class DatabaseProxy {
         }
     }
 
-    protected static void initDataSource() {
+    private static void initDataSource() {
         dataSource = new BasicDataSource();
         dataSource.setUrl(url);
         dataSource.setUsername(username);
@@ -131,21 +143,6 @@ public class DatabaseProxy {
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(10);
         dataSource.setMaxOpenPreparedStatements(100);
-    }
-
-    protected static void loadDatabaseProperties() throws DatabaseException {
-        Properties props;
-        try {
-            props = FilePropertiesLoader.load("server/src/main/resources/database.properties");
-        } catch (IOException e) {
-            throw new DatabaseException("Could not find database properties file under given path: "
-                    + "server/src/main/resources/database.properties", e);
-        }
-
-        url = props.getProperty("url");
-        driver = props.getProperty("driver");
-        username = props.getProperty("username");
-        password = props.getProperty("password");
     }
 
     private static void loadDriver() throws DatabaseException {

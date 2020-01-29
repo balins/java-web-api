@@ -5,6 +5,7 @@ import com.balinski.api_project.database.dao.DaoManager;
 import com.balinski.api_project.database.model.Film;
 import com.balinski.api_project.database.model.User;
 import com.balinski.api_project.servlet.util.JsonResponseBuilder;
+import com.balinski.api_project.servlet.util.StringToArrayConverter;
 import com.balinski.api_project.servlet.util.UserAuthenticator;
 
 import javax.servlet.http.HttpServlet;
@@ -22,7 +23,7 @@ public class FilmServlet extends HttpServlet {
 
         var enumeration = req.getParameterNames();
         var supportedParameters = Set.of("id", "page", "perPage", "title", "language",
-                "minLength", "maxLength", "lengthBetween", "order", "user", "token");
+                "minLength", "maxLength", "order", "user", "token");
         var param = Collections.list(enumeration)
                 .stream()
                 .distinct()
@@ -37,31 +38,30 @@ public class FilmServlet extends HttpServlet {
             var dao = DaoManager.getFilmDao();
 
             if(param.get("id") != null){
-                for(var id : param.get("id").split(","))
-                    films.addAll(dao.getById(Integer.parseInt(id)));
-            }
-            else if(param.get("title") != null){
+                int[] ids = StringToArrayConverter.toIntArray(param.get("id"));
+                films.addAll(dao.getManyByIds(ids));
+            } else if(param.get("title") != null){
                 for(var title : param.get("title").split(","))
                     films.addAll(dao.getByTitle(title));
-            }
-            else if(param.get("language") != null){
+            } else if(param.get("language") != null){
                 for(var language : param.get("language").split(","))
-                    films.addAll(dao.getByTitle(language));
-            }
-            else if(param.get("minLength") != null) {
-                films = dao.getLongerThan(Integer.parseInt(param.get("minLength")));
-                films.sort(Comparator.comparing(Film::getLength).thenComparing(Film::getTitle));
-            }
-            else if(param.get("maxLength") != null){
-                films = dao.getShorterThan(Integer.parseInt(param.get("maxLength")));
-                films.sort(Comparator.comparing(Film::getLength).thenComparing(Film::getTitle));
-            }
-            else if(param.get("lengthBetween") != null) {
-                String[] length = param.get("lengthBetween").split(",");
-                films = dao.getWithLengthBetween(Integer.parseInt(length[0]), Integer.parseInt(length[1]));
-                films.sort(Comparator.comparing(Film::getLength).thenComparing(Film::getTitle));
+                    films.addAll(dao.getAvailableInLanguage(language));
             } else
                 films = dao.getAll();
+
+            if(param.get("minLength") != null || param.get("maxLength") != null) {
+                if(param.get("minLength") != null) {
+                    films = films.stream()
+                            .filter(film -> film.getLength() >= Integer.parseInt(param.get("minLength")))
+                            .collect(Collectors.toList());
+                }
+                if(param.get("maxLength") != null){
+                    films = films.stream()
+                            .filter(film -> film.getLength() <= Integer.parseInt(param.get("maxLength")))
+                            .collect(Collectors.toList());
+                }
+                films.sort(Comparator.comparing(Film::getLength).thenComparing(Film::getTitle));
+            }
 
             if(param.get("order") != null) {
                 if(param.get("order").equalsIgnoreCase("desc"))

@@ -1,17 +1,24 @@
 package com.balinski.api_project.server;
 
+import com.balinski.api_project.database.DatabaseProxy;
 import com.balinski.api_project.servlet.*;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.webapp.WebAppContext;
+
+import java.util.Properties;
 
 public class JettyServer {
-    private static ServletContextHandler context = new ServletContextHandler();
+    private static WebAppContext context = new WebAppContext();
 
-    public static void start(int port) {
+    public static void start(int port, Properties dbProps) {
         final Server server = new Server(port);
         context.setContextPath("/");
+        context.setDescriptor(JettyServer.class.getResource("/WEB-INF/web.xml").toString());
+        context.setResourceBase(".");
         registerServlets();
         server.setHandler(context);
+
+        DatabaseProxy.init(dbProps);
 
         try {
             server.start();
@@ -22,7 +29,7 @@ public class JettyServer {
 
 
     private static void registerServlets() {
-        context.addServlet(ActorServlet.class, "/actors");
+        context.addServlet(ActorServlet.class, "/actors/*");
         context.addServlet(FilmServlet.class, "/films/*");
         context.addServlet(LanguageServlet.class, "/languages/*");
         context.addServlet(UserServlet.class, "/users/*");

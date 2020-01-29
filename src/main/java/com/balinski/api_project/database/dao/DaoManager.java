@@ -33,7 +33,7 @@ public class DaoManager {
         }
     }
 
-    static int modifyData(String sql, boolean transaction) throws DaoException {
+    static List<Map<String, Object>> modifyData(String sql, boolean transaction) throws DaoException {
         try {
             return DatabaseProxy.queryUpdate(sql, transaction);
         } catch (DatabaseException e) {

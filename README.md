@@ -6,7 +6,7 @@ The API gives access to database resources and returns data in **JSON**.
 
 Built using **plain Java EE** and **Jetty** server.
 
-Implemented with **DAO** pattern.
+Implemented using **DAO** pattern.
 
 Tested on **H2Database** v1.4.196.
 

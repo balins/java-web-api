@@ -1,4 +1,5 @@
-#Java Web API
+# Java Web API
+
 A simple **standalone web application** providing API.
 
 The API gives access to database resources and returns data in **JSON**.
@@ -9,7 +10,8 @@ Implemented with **DAO** pattern.
 
 Tested on **H2Database** v1.4.196.
 
-##Configuration
+## Configuration
+
 * Build using Maven `mvn install`
 * Create a new database
     * you can find **ready-to-go** database and .properties files in folder `/example_db`.
@@ -20,33 +22,57 @@ Tested on **H2Database** v1.4.196.
 
     `example.properties`
     ```
-    <pre>
-    url=<i>url of your database</i>
-    driver=<i>jdbc driver of your database</i>
-    username=<i>login for your database</i>
-    password=<i>password for your database</i>
-    </pre>
+    url=*url of your database*
+    driver=*jdbc driver of your database*
+    username=*login for your database*
+    password=*password for your database*
     ```
 * Run application with the following parameters:
     * `-port [1024..49151]` - port number that will be used by server
     * `-dbProps path` - **relative** path to _.properties_ file
 * Now you are able to connect at localhost:_port_ and start sending requests!
 
-##Authentication
+## Authentication
+
 Every user of API has to pass his username and access token along with every request:
 
     `/route?user=username&token=user_token&key1=val1&key2=val2...`
 
 Of course, all parameters can occur in any order.
 
-##Public routes
+## User roles
+
+Every user is created with
+* role - _user_ (standard user) or _admin_ (administrator),
+* name,
+* access token,
+* usage limit.
+
+After _limit_ requests, every user has to get his limit renewed by an admin.
+
+### Standard user
+
+Can access all **public** routes of the API in terms of his usage limits.
+
+### Administrator
+
+Can access **all routes** of the API in terms of his usage limits and has ability to:
+* access all users' data,
+* add new users,
+* delete current users,
+* renew current users' usage limits.
+
+## Public routes
+
 API consists of 3 public routes:
 * **/actors** - provides access to actors data
 * **/films** - provides access to films data
 * **/languages** - provides access to languages data
 
-###GET Parameters
+### GET Parameters
+
 #### All routes
+
 All of the routes mentioned above provide:
 * obtaining all records under given route
 
@@ -68,9 +94,10 @@ All of the routes mentioned above provide:
 
         /languages?order=asc...
 
-####Route-specific parameters
+#### Route-specific parameters
 
-#####/actor
+##### /actor
+
 * firstName
 
         /actors?firstName=Woody...
@@ -80,7 +107,8 @@ All of the routes mentioned above provide:
         /actors?lastName=Williams...
 
 
-#####/film
+##### /film
+
 You can mix title and language with both minLength and maxLength.
 
 * title
@@ -97,42 +125,26 @@ You can mix title and language with both minLength and maxLength.
 
 * maxLength (with duration equal or less than)
 
-        `/films?language=mandarin&maxLength=99...`
+        /films?language=mandarin&maxLength=99...
 
-#####/language
+##### /language
+
 * name
 
         /language?name=english...
 
-##Admin routes
+## Admin routes
+
 Non-public (accessible only to application's admins) part of the API has 2 routes:
 * **/user** - provides access to users data
 * **/admin** - provides access to mechanisms of user management
 
 Operations on these routes don't subtract from your usage limit.
 
-###User
-Every user is created with
-* role - _user_ (standard user) or _admin_ (administrator),
-* name,
-* access token,
-* usage limit.
+### GET Parameters
 
-After _limit_ requests, every user has to get his limit renewed by an admin.
+##### /user
 
-###Standard user
-Can access all **public** routes of the API in terms of his usage limits.
-
-###Administrator
-Can access **all routes** of the API in terms of his usage limits and has ability to:
-* access all users' data,
-* add new users,
-* delete current users,
-* renew current users' usage limits.
-
-###GET Parameters
-
-#####/user
 * as well as in public API, you can order and paginate the results as well as get multiple results
 by listing many ids
 
@@ -156,7 +168,7 @@ by listing many ids
             /user?filter=noaccess...
 
 
-#####/admin
+##### /admin
 * action
     * add
 
@@ -176,7 +188,7 @@ You can modify multiple records within one request, for example:
     /admin?action=renew&id=1,2,4,8&limit=16,32,64,128
 
 
-##Credits
+## Credits
 Thanks to [@math-g](https://github.com/math-g) for porting Sakila (sample MySQL database) to H2 dialect.
 
 

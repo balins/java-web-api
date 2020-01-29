@@ -36,7 +36,7 @@ Tested on **H2Database** v1.4.196.
 
 Every user of API has to pass his username and access token along with every request:
 
-    `/route?user=username&token=user_token&key1=val1&key2=val2...`
+    /route?user=username&token=user_token&key1=val1&key2=val2...
 
 Of course, all parameters can occur in any order.
 

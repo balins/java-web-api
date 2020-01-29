@@ -107,7 +107,6 @@ All of the routes mentioned above provide:
 
         /actors?lastName=Williams...
 
-
 ##### /films
 
 You can mix title and language with both minLength and maxLength.

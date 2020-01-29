@@ -27,6 +27,7 @@ Tested on **H2Database** v1.4.196.
     username=*login for your database*
     password=*password for your database*
     ```
+    
 * Run application with the following parameters:
     * `-port [1024..49151]` - port number that will be used by server
     * `-dbProps path` - **relative** path to _.properties_ file
@@ -96,7 +97,7 @@ All of the routes mentioned above provide:
 
 #### Route-specific parameters
 
-##### /actor
+##### /actors
 
 * firstName
 
@@ -106,8 +107,7 @@ All of the routes mentioned above provide:
 
         /actors?lastName=Williams...
 
-
-##### /film
+##### /films
 
 You can mix title and language with both minLength and maxLength.
 
@@ -127,45 +127,45 @@ You can mix title and language with both minLength and maxLength.
 
         /films?language=mandarin&maxLength=99...
 
-##### /language
+##### /languages
 
 * name
 
-        /language?name=english...
+        /languages?name=english...
 
 ## Admin routes
 
 Non-public (accessible only to application's admins) part of the API has 2 routes:
-* **/user** - provides access to users data
+* **/users** - provides access to users data
 * **/admin** - provides access to mechanisms of user management
 
 Operations on these routes don't subtract from your usage limit.
 
 ### GET Parameters
 
-##### /user
+##### /users
 
 * as well as in public API, you can order and paginate the results as well as get multiple results
 by listing many ids
 
-        /user?page=1&perPage=5&order=asc
+        /users?page=1&perPage=5&order=asc
 
 * filter
     * all (returns all users)
 
-            /user?filter=all...
+            /users?filter=all...
 
     * admin (filters by role)
 
-            /user?filter=admin...
+            /users?filter=admin...
 
     * user (filters by role)
 
-            /user?filter=user...
+            /users?filter=user...
 
     * noaccess (returns users that have exhausted their usage limit)
 
-            /user?filter=noaccess...
+            /users?filter=noaccess...
 
 
 ##### /admin

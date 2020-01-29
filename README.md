@@ -1,6 +1,6 @@
 # Java Web API
 
-A simple **standalone web application** providing API.
+A simple **standalone web application** providing public interface.
 
 The API gives access to database resources and returns data in **JSON**.
 

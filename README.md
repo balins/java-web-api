@@ -4,7 +4,7 @@ A simple **standalone web application** providing public interface.
 
 The API gives access to database resources and returns data in **JSON**.
 
-Built using **plain Java EE** and **Jetty** server.
+Built using **Java EE** and **Jetty**.
 
 Implemented using **DAO** pattern.
 
